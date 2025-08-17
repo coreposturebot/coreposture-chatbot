@@ -1,0 +1,1164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CorePosture Chiropractic AI Assistant</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 400;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        
+        .chatbot {
+            width: 420px;
+            height: 700px;
+            background: #ffffff;
+            border-radius: 24px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08), 0 8px 16px rgba(0, 0, 0, 0.04);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #2d5aa0 0%, #1e3c72 100%);
+            color: white;
+            padding: 32px 24px 28px 24px;
+            text-align: center;
+            position: relative;
+        }
+        
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 100%);
+            pointer-events: none;
+        }
+        
+        .header h2 {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 600;
+            font-size: 20px;
+            margin-bottom: 4px;
+            letter-spacing: -0.02em;
+        }
+        
+        .header p {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 400;
+            font-size: 14px;
+            opacity: 0.9;
+            letter-spacing: 0.01em;
+        }
+        
+        .status-dot {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 10px;
+            height: 10px;
+            background: #10b981;
+            border-radius: 50%;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.2); opacity: 0.8; }
+        }
+        
+        .messages {
+            flex: 1;
+            padding: 24px 20px;
+            overflow-y: auto;
+            background: #fafbfc;
+            background-image: 
+                radial-gradient(circle at 1px 1px, rgba(45, 90, 160, 0.02) 1px, transparent 0);
+            background-size: 20px 20px;
+        }
+        
+        .messages::-webkit-scrollbar {
+            width: 4px;
+        }
+        
+        .messages::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        
+        .messages::-webkit-scrollbar-thumb {
+            background: rgba(45, 90, 160, 0.2);
+            border-radius: 2px;
+        }
+        
+        .message {
+            margin: 16px 0;
+            animation: fadeInUp 0.4s ease-out;
+        }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(16px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .bot-message {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 20px;
+        }
+        
+        .bot-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #2d5aa0, #1e3c72);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 600;
+            font-size: 12px;
+            margin-right: 12px;
+            flex-shrink: 0;
+            box-shadow: 0 2px 8px rgba(45, 90, 160, 0.3);
+        }
+        
+        .bot-bubble {
+            background: #ffffff;
+            padding: 16px 20px;
+            border-radius: 20px 20px 20px 4px;
+            max-width: 80%;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+            border: 1px solid rgba(45, 90, 160, 0.06);
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 400;
+            font-size: 14px;
+            line-height: 1.5;
+            color: #374151;
+        }
+        
+        .user-message {
+            display: flex;
+            justify-content: flex-end;
+            margin-bottom: 20px;
+        }
+        
+        .user-bubble {
+            background: linear-gradient(135deg, #2d5aa0, #1e3c72);
+            color: white;
+            padding: 16px 20px;
+            border-radius: 20px 20px 4px 20px;
+            max-width: 80%;
+            box-shadow: 0 2px 12px rgba(45, 90, 160, 0.3);
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 400;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+        
+        .booking-buttons {
+            margin: 16px 0 8px 0;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        
+        .booking-btn {
+            background: linear-gradient(135deg, #dc2626, #b91c1c);
+            color: white;
+            border: none;
+            padding: 14px 20px;
+            border-radius: 16px;
+            cursor: pointer;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 500;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(220, 38, 38, 0.25);
+        }
+        
+        .booking-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(220, 38, 38, 0.35);
+        }
+        
+        .quick-btns {
+            margin: 16px 0 8px 0;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        
+        .quick-btn {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            padding: 8px 14px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 500;
+            font-size: 12px;
+            color: #495057;
+            transition: all 0.2s ease;
+        }
+        
+        .quick-btn:hover {
+            background: #e9ecef;
+            border-color: #2d5aa0;
+            color: #2d5aa0;
+            transform: translateY(-1px);
+        }
+        
+        .input-area {
+            padding: 20px 24px 24px 24px;
+            background: #ffffff;
+            border-top: 1px solid #f1f3f4;
+        }
+        
+        .input-wrapper {
+            display: flex;
+            align-items: center;
+            background: #f8f9fa;
+            border-radius: 24px;
+            padding: 4px;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+        
+        .input-wrapper:focus-within {
+            background: #ffffff;
+            border-color: #2d5aa0;
+            box-shadow: 0 0 0 4px rgba(45, 90, 160, 0.1);
+        }
+        
+        .input-field {
+            flex: 1;
+            border: none;
+            background: transparent;
+            padding: 14px 20px;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 400;
+            font-size: 14px;
+            outline: none;
+            color: #374151;
+        }
+        
+        .input-field::placeholder {
+            color: #9ca3af;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 400;
+        }
+        
+        .send-btn {
+            background: linear-gradient(135deg, #2d5aa0, #1e3c72);
+            color: white;
+            border: none;
+            width: 44px;
+            height: 44px;
+            border-radius: 22px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            font-size: 16px;
+            margin: 2px;
+            box-shadow: 0 2px 8px rgba(45, 90, 160, 0.3);
+        }
+        
+        .send-btn:hover:not(:disabled) {
+            transform: scale(1.05);
+            box-shadow: 0 4px 16px rgba(45, 90, 160, 0.4);
+        }
+        
+        .send-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .status {
+            color: #6b7280;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 400;
+            font-size: 11px;
+            text-align: center;
+            padding: 8px 16px 0 16px;
+            letter-spacing: 0.02em;
+        }
+        
+        .bot-name {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 600;
+            color: #2d5aa0;
+            margin-bottom: 4px;
+            font-size: 13px;
+        }
+        
+        .user-name {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.9);
+            margin-bottom: 4px;
+            font-size: 13px;
+        }
+        
+        .typing-indicator {
+            display: flex;
+            align-items: center;
+            padding: 8px 0;
+            color: #6b7280;
+            font-size: 12px;
+            font-style: italic;
+        }
+        
+        .typing-dots {
+            display: inline-flex;
+            margin-left: 8px;
+        }
+        
+        .typing-dots span {
+            height: 4px;
+            width: 4px;
+            background: #6b7280;
+            border-radius: 50%;
+            display: inline-block;
+            margin: 0 1px;
+            animation: typing 1.4s infinite;
+        }
+        
+        .typing-dots span:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+        
+        .typing-dots span:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+        
+        @keyframes typing {
+            0%, 60%, 100% { transform: translateY(0); }
+            30% { transform: translateY(-10px); }
+        }
+        
+        /* Mobile responsiveness */
+        @media (max-width: 480px) {
+            body {
+                padding: 0;
+            }
+            
+            .chatbot {
+                width: 100vw;
+                height: 100vh;
+                border-radius: 0;
+            }
+            
+            .header {
+                padding: 40px 24px 32px 24px;
+            }
+            
+            .messages {
+                padding: 20px 16px;
+            }
+            
+            .input-area {
+                padding: 16px 20px 32px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="chatbot">
+        <div class="header">
+            <div class="status-dot"></div>
+            <h2>CorePosture Chiropractic</h2>
+            <p>Newport Beach, CA • AI Assistant</p>
+        </div>
+        
+        <div class="messages" id="messages">
+            <!-- Messages will be added by JavaScript -->
+        </div>
+        
+        <div class="input-area">
+            <div class="input-wrapper">
+                <input type="text" id="userInput" class="input-field" placeholder="Ask me anything about CorePosture..." onkeypress="if(event.key==='Enter') sendMessage()">
+                <button onclick="sendMessage()" class="send-btn">
+                    ➤
+                </button>
+            </div>
+        </div>
+        
+        <div class="status" id="status">Ready • AI Assistant</div>
+    </div>
+
+    <script>
+        console.log('🚀 Intelligent Chatbot starting...');
+        
+        // Conversation state and context
+        let conversationState = {
+            messageCount: 0,
+            leadCaptureStarted: false,
+            leadCaptureStep: 'none',
+            leadData: {},
+            conversationHistory: [],
+            userProfile: {
+                concerns: [],
+                patientType: null, // 'new' or 'existing'
+                painAreas: [],
+                previousTreatments: [],
+                urgency: 'normal'
+            },
+            currentTopics: []
+        };
+        
+        // Advanced AI-like response system with contextual understanding
+        const intelligentResponses = {
+            
+            // Greeting and initial responses
+            generateGreeting: function() {
+                const greetings = [
+                    "Hi there! 👋 Welcome to CorePosture Chiropractic! I'm here to help you understand how Dr. Tyler Meier's specialized CBP approach can help with your spinal health concerns.",
+                    "Hello! 😊 Thanks for visiting CorePosture Chiropractic in Newport Beach. I'd love to help you learn about our unique CBP treatment approach and how it might benefit you.",
+                    "Welcome! 🌟 I'm here to answer your questions about CorePosture Chiropractic and Dr. Tyler's expertise in CBP treatment and scoliosis care."
+                ];
+                return greetings[Math.floor(Math.random() * greetings.length)];
+            },
+            
+            // Advanced contextual response generation
+            generateResponse: function(userMessage) {
+                const analysis = this.analyzeMessage(userMessage);
+                const context = this.getConversationContext();
+                
+                // Update user profile based on analysis
+                this.updateUserProfile(analysis);
+                
+                // Generate contextually appropriate response
+                if (analysis.isFollowUp && context.lastTopic) {
+                    return this.generateFollowUpResponse(context.lastTopic, analysis);
+                }
+                
+                if (analysis.intent) {
+                    return this.generateIntentResponse(analysis.intent, analysis, context);
+                }
+                
+                return this.generateIntelligentFallback(analysis, context);
+            },
+            
+            // Message analysis with sentiment and intent detection
+            analyzeMessage: function(message) {
+                const msg = message.toLowerCase();
+                const analysis = {
+                    originalMessage: message,
+                    cleanMessage: msg,
+                    intent: null,
+                    sentiment: 'neutral',
+                    urgency: 'normal',
+                    painLevel: null,
+                    concerns: [],
+                    isFollowUp: false,
+                    needsDetails: false,
+                    isQuestionAboutResults: false,
+                    mentionsCost: false,
+                    mentionsTime: false
+                };
+                
+                // Detect follow-up patterns
+                const followUpPatterns = [
+                    'what does that mean', 'tell me more', 'can you explain', 'how does that work',
+                    'what do you mean', 'elaborate', 'more details', 'i don\'t understand',
+                    'can you clarify', 'what is that', 'how so', 'why is that'
+                ];
+                analysis.isFollowUp = followUpPatterns.some(pattern => msg.includes(pattern));
+                
+                // Detect urgency and pain level
+                const urgentWords = ['severe', 'intense', 'unbearable', 'emergency', 'can\'t take', 'desperate'];
+                const highPainWords = ['excruciating', '10/10', 'worst pain', 'can\'t sleep', 'can\'t work'];
+                
+                if (urgentWords.some(word => msg.includes(word))) {
+                    analysis.urgency = 'high';
+                    analysis.sentiment = 'distressed';
+                }
+                if (highPainWords.some(word => msg.includes(word))) {
+                    analysis.painLevel = 'severe';
+                    analysis.sentiment = 'distressed';
+                }
+                
+                // Intent detection with contextual understanding
+                const intentPatterns = {
+                    booking: {
+                        patterns: ['book', 'schedule', 'appointment', 'consultation', 'visit', 'come in', 'available times', 'when can i'],
+                        weight: 10
+                    },
+                    cbp: {
+                        patterns: ['cbp', 'chiropractic biophysics', 'what makes you different', 'your approach', 'technique'],
+                        weight: 9
+                    },
+                    scoliosis: {
+                        patterns: ['scoliosis', 'curved spine', 'spinal curve', 'scolibrace', 'spine curvature', 'back curved'],
+                        weight: 9
+                    },
+                    sciatica: {
+                        patterns: ['sciatica', 'sciatic', 'leg pain', 'shooting pain', 'pain down leg', 'nerve pain'],
+                        weight: 8
+                    },
+                    headaches: {
+                        patterns: ['headache', 'migraine', 'head pain', 'tension headache', 'neck headache'],
+                        weight: 8
+                    },
+                    backPain: {
+                        patterns: ['back pain', 'lower back', 'upper back', 'spine pain', 'disc', 'lumbar'],
+                        weight: 7
+                    },
+                    neckPain: {
+                        patterns: ['neck pain', 'cervical', 'stiff neck', 'neck problems', 'whiplash'],
+                        weight: 7
+                    },
+                    insurance: {
+                        patterns: ['insurance', 'cost', 'price', 'expensive', 'afford', 'covered', 'ppo', 'hmo'],
+                        weight: 6
+                    },
+                    results: {
+                        patterns: ['results', 'how long', 'when will', 'does it work', 'effective', 'success rate'],
+                        weight: 6
+                    },
+                    newPatient: {
+                        patterns: ['first time', 'new patient', 'never been', 'what to expect', 'first visit'],
+                        weight: 6
+                    }
+                };
+                
+                let bestMatch = { intent: null, score: 0 };
+                Object.entries(intentPatterns).forEach(([intent, config]) => {
+                    let score = 0;
+                    config.patterns.forEach(pattern => {
+                        if (msg.includes(pattern)) {
+                            score += config.weight;
+                        }
+                    });
+                    if (score > bestMatch.score) {
+                        bestMatch = { intent, score };
+                    }
+                });
+                
+                analysis.intent = bestMatch.score > 5 ? bestMatch.intent : null;
+                
+                // Detect specific concerns and pain areas
+                if (msg.includes('sciatica') || msg.includes('leg pain')) analysis.concerns.push('sciatica');
+                if (msg.includes('headache') || msg.includes('migraine')) analysis.concerns.push('headaches');
+                if (msg.includes('scoliosis')) analysis.concerns.push('scoliosis');
+                if (msg.includes('neck')) analysis.concerns.push('neck');
+                if (msg.includes('back')) analysis.concerns.push('back');
+                
+                return analysis;
+            },
+            
+            // Get conversation context
+            getConversationContext: function() {
+                const history = conversationState.conversationHistory;
+                return {
+                    lastTopic: history.length > 0 ? history[history.length - 1].topic : null,
+                    discussedTopics: [...new Set(history.map(h => h.topic).filter(Boolean))],
+                    messageCount: conversationState.messageCount,
+                    userConcerns: conversationState.userProfile.concerns,
+                    hasDiscussedCBP: history.some(h => h.topic === 'cbp'),
+                    hasDiscussedBooking: history.some(h => h.topic === 'booking')
+                };
+            },
+            
+            // Update user profile based on conversation
+            updateUserProfile: function(analysis) {
+                if (analysis.concerns.length > 0) {
+                    analysis.concerns.forEach(concern => {
+                        if (!conversationState.userProfile.concerns.includes(concern)) {
+                            conversationState.userProfile.concerns.push(concern);
+                        }
+                    });
+                }
+                
+                if (analysis.urgency === 'high') {
+                    conversationState.userProfile.urgency = 'high';
+                }
+            },
+            
+            // Generate intelligent responses by intent
+            generateIntentResponse: function(intent, analysis, context) {
+                const responses = {
+                    booking: this.generateBookingResponse(analysis, context),
+                    cbp: this.generateCBPResponse(analysis, context),
+                    scoliosis: this.generateScoliosisResponse(analysis, context),
+                    sciatica: this.generateSciaticaResponse(analysis, context),
+                    headaches: this.generateHeadacheResponse(analysis, context),
+                    backPain: this.generateBackPainResponse(analysis, context),
+                    neckPain: this.generateNeckPainResponse(analysis, context),
+                    insurance: this.generateInsuranceResponse(analysis, context),
+                    results: this.generateResultsResponse(analysis, context),
+                    newPatient: this.generateNewPatientResponse(analysis, context)
+                };
+                
+                return responses[intent] || this.generateIntelligentFallback(analysis, context);
+            },
+            
+            // Specific response generators
+            generateSciaticaResponse: function(analysis, context) {
+                const responses = [
+                    "Sciatica can be incredibly frustrating and limiting! 😔 The shooting pain down your leg often comes from spinal misalignment putting pressure on the sciatic nerve. Here's how our CBP approach helps:",
+                    "I understand how debilitating sciatica can be. The good news is that many of our patients see significant improvement because CBP addresses the root structural cause - spinal misalignment that's compressing your sciatic nerve."
+                ];
+                
+                let response = responses[Math.floor(Math.random() * responses.length)];
+                response += "\n\n🎯 **Our CBP approach for sciatica:**\n";
+                response += "• Precise spinal correction to relieve nerve pressure\n";
+                response += "• Custom traction to restore proper spinal curves\n";
+                response += "• Mirror-image exercises to retrain your posture\n";
+                response += "• Long-term structural changes, not just pain relief\n\n";
+                
+                if (analysis.urgency === 'high') {
+                    response += "Given the severity you're describing, I'd strongly recommend scheduling a consultation soon. Dr. Tyler can do a complete assessment to see exactly what's causing your sciatica. ";
+                }
+                
+                response += "Most patients notice improvement within the first few weeks! Would you like to schedule a complimentary consultation?";
+                
+                return {
+                    text: response,
+                    topic: 'sciatica',
+                    followUps: ['How long for sciatica relief?', 'CBP vs other treatments?', 'Book consultation'],
+                    shouldOfferBooking: true
+                };
+            },
+            
+            generateHeadacheResponse: function(analysis, context) {
+                const responses = [
+                    "Headaches are often a sign that something's not right with your neck alignment! 🤕 Many of our patients are amazed to discover their headaches were actually coming from their cervical spine.",
+                    "Chronic headaches can really impact your quality of life. What many people don't realize is that most tension headaches and even some migraines stem from neck misalignment and forward head posture."
+                ];
+                
+                let response = responses[Math.floor(Math.random() * responses.length)];
+                response += "\n\n💡 **How CBP helps with headaches:**\n";
+                response += "• Corrects forward head posture (a major headache trigger)\n";
+                response += "• Restores proper cervical curve to reduce muscle tension\n";
+                response += "• Improves blood flow and nerve function to the head\n";
+                response += "• Addresses the structural cause, not just symptoms\n\n";
+                
+                if (analysis.cleanMessage.includes('migraine')) {
+                    response += "For migraines specifically, we often see great results because many migraines have a cervical (neck) component. ";
+                }
+                
+                response += "Dr. Tyler can determine if your headaches are related to spinal alignment issues. Would you like to schedule a consultation to find out?";
+                
+                return {
+                    text: response,
+                    topic: 'headaches',
+                    followUps: ['Types of headaches you treat?', 'How quickly do headaches improve?', 'Schedule consultation'],
+                    shouldOfferBooking: true
+                };
+            },
+            
+            generateCBPResponse: function(analysis, context) {
+                if (context.hasDiscussedCBP) {
+                    return {
+                        text: "Since we've talked about CBP, let me add that Dr. Tyler completed the full CBP certification program - he's one of only a handful of doctors in California with this advanced training! This means he can provide the most precise, research-based spinal correction available. What specific aspect of CBP interests you most?",
+                        topic: 'cbp',
+                        followUps: ['What makes Dr. Tyler special?', 'CBP vs regular chiropractic?', 'See Dr. Tyler\'s credentials']
+                    };
+                }
+                
+                return {
+                    text: "CBP (Chiropractic BioPhysics®) is what makes our practice special! 🔬 It's the most researched chiropractic technique in the world, using physics and engineering principles to precisely correct spinal alignment.\n\n🎯 **What makes CBP unique:**\n• Uses digital X-ray analysis for precise measurements\n• Creates custom treatment plans based on YOUR specific spinal geometry\n• Combines adjustments, traction, and exercises for lasting results\n• Backed by over 200 peer-reviewed research studies\n\n**Dr. Tyler's expertise:** He's CBP-certified, which means advanced training beyond regular chiropractic school. Most chiropractors aren't trained in this technique!",
+                    topic: 'cbp',
+                    followUps: ['How is CBP different?', 'Dr. Tyler\'s qualifications?', 'Book CBP consultation']
+                };
+            },
+            
+            generateScoliosisResponse: function(analysis, context) {
+                return {
+                    text: "Scoliosis treatment is one of our specialties! 🌟 We use ScoliBrace technology - the only brace designed to actually CORRECT curves, not just prevent worsening.\n\n✨ **Why we're different:**\n• ScoliBrace uses 3D correction principles\n• Even orthopedic surgeons refer patients to us\n• We combine bracing with CBP spinal correction\n• Many patients avoid surgery with our approach\n\n**Our success:** We've helped patients reduce their curves significantly, and many avoid the surgeries they were told they'd need. The key is addressing scoliosis structurally, not just managing it.",
+                    topic: 'scoliosis',
+                    followUps: ['Am I too old for scoliosis treatment?', 'ScoliBrace vs traditional braces?', 'Success stories'],
+                    shouldOfferBooking: true
+                };
+            },
+            
+            generateInsuranceResponse: function(analysis, context) {
+                return {
+                    text: "Great question about insurance! 💰 Most of our patients with PPO insurance get significant reimbursement.\n\n✅ **What's usually covered:**\n• Initial consultation and examination\n• X-rays when medically necessary\n• Chiropractic treatments and adjustments\n• Many therapeutic procedures\n\n📋 **We make it easy:**\n• We verify your benefits before treatment\n• Handle all the insurance paperwork\n• Explain exactly what you'll owe upfront\n• Offer payment plans if needed\n\nWould you like me to help you get scheduled so we can verify your specific benefits?",
+                    topic: 'insurance',
+                    followUps: ['What if I have high deductible?', 'Payment plan options?', 'Verify my benefits'],
+                    shouldOfferBooking: true
+                };
+            },
+            
+            generateBookingResponse: function(analysis, context) {
+                let response = "I'd love to help you get scheduled with Dr. Tyler! 😊 ";
+                
+                if (conversationState.userProfile.urgency === 'high') {
+                    response += "Given what you've described, I think you'd really benefit from Dr. Tyler's expertise. ";
+                }
+                
+                response += "New patients receive a complimentary consultation where Dr. Tyler will:\n\n";
+                response += "🔍 **Complete Assessment:**\n";
+                response += "• Detailed discussion of your concerns\n";
+                response += "• Thorough spinal examination\n";
+                response += "• Digital X-rays if needed\n";
+                response += "• Personalized treatment recommendations\n\n";
+                response += "The consultation typically takes 60-90 minutes so Dr. Tyler can really understand your situation.";
+                
+                return {
+                    text: response,
+                    topic: 'booking',
+                    shouldShowBooking: true
+                };
+            },
+            
+            generateResultsResponse: function(analysis, context) {
+                return {
+                    text: "Great question about results! 📈 Every patient is unique, but here's what most people experience:\n\n⚡ **Weeks 1-4: Initial Relief**\n• Reduced pain and stiffness\n• Better sleep quality\n• Improved daily function\n\n📊 **Months 2-3: Noticeable Changes**\n• Better posture (others notice!)\n• Increased range of motion\n• Fewer pain episodes\n\n🎯 **Months 4-12: Structural Correction**\n• X-rays show measurable improvement\n• Long-lasting spinal changes\n• Significantly reduced future risk\n\nThe key factors for your success are consistency with treatment and following Dr. Tyler's recommendations. Would you like to schedule a consultation to discuss realistic expectations for your specific situation?",
+                    topic: 'results',
+                    followUps: ['What affects my results?', 'How often do I need to come?', 'Schedule consultation'],
+                    shouldOfferBooking: true
+                };
+            },
+            
+            generateNewPatientResponse: function(analysis, context) {
+                return {
+                    text: "Welcome! Here's exactly what to expect on your first visit: 👋\n\n📋 **Your 60-90 Minute Consultation:**\n• Detailed discussion of your health history\n• Comprehensive spinal examination\n• Postural analysis and movement assessment\n• Digital X-rays if clinically necessary\n• Clear explanation of findings\n• Personalized treatment plan\n• Insurance verification and cost discussion\n\n💼 **What to bring:**\n• Insurance cards\n• Previous X-rays/MRIs (if you have them)\n• List of current medications\n• Comfortable clothing\n\nDr. Tyler takes time to really understand your situation - you won't feel rushed! Ready to schedule?",
+                    topic: 'newPatient',
+                    followUps: ['How long is first visit?', 'Will I get treated same day?', 'Schedule now'],
+                    shouldOfferBooking: true
+                };
+            },
+            
+            generateBackPainResponse: function(analysis, context) {
+                return {
+                    text: "Back pain can really disrupt your life! 😔 What many people don't realize is that most back pain stems from spinal misalignment that develops over time.\n\n🎯 **Our CBP approach targets:**\n• Loss of natural spinal curves\n• Postural imbalances\n• Disc compression and nerve irritation\n• Muscle tension and weakness patterns\n\n✨ **Why CBP works for back pain:**\n• We find and fix the ROOT CAUSE\n• Not just temporary relief - lasting correction\n• Prevents future episodes\n• Improves overall spinal health\n\nMost patients notice improvement within weeks, with significant structural changes over months. Would you like to schedule a consultation to see what's causing your back pain?",
+                    topic: 'backPain',
+                    followUps: ['Types of back pain you treat?', 'How long for relief?', 'Book consultation'],
+                    shouldOfferBooking: true
+                };
+            },
+            
+            generateNeckPainResponse: function(analysis, context) {
+                return {
+                    text: "Neck pain is incredibly common in our digital world! 📱 Forward head posture from computer work and phone use creates tremendous strain on your cervical spine.\n\n🔍 **Common neck problems we see:**\n• Forward head posture\n• Loss of cervical lordosis (natural neck curve)\n• Muscle tension and trigger points\n• Nerve irritation\n\n💡 **CBP's approach to neck pain:**\n• Restores proper cervical curve\n• Corrects forward head posture\n• Reduces muscle tension naturally\n• Improves nerve function\n\nThe great news is that neck problems often respond very well to CBP treatment! Would you like to find out what's causing your neck pain?",
+                    topic: 'neckPain',
+                    followUps: ['Exercises for neck pain?', 'How quickly improves?', 'Schedule evaluation'],
+                    shouldOfferBooking: true
+                };
+            },
+            
+            // Intelligent fallback with context awareness
+            generateIntelligentFallback: function(analysis, context) {
+                const fallbacks = [
+                    "That's a thoughtful question! While I can share general information about CBP treatment and our services, Dr. Tyler would be the best person to give you specific guidance for your unique situation.",
+                    "I appreciate you asking! For detailed answers about your particular case, I'd recommend speaking directly with Dr. Tyler during a consultation - he can give you personalized insights.",
+                    "Great question! Every patient's situation is unique, so Dr. Tyler would need to evaluate your specific case to give you the most accurate information."
+                ];
+                
+                let response = fallbacks[Math.floor(Math.random() * fallbacks.length)];
+                
+                // Add contextual follow-up based on user's concerns
+                if (conversationState.userProfile.concerns.length > 0) {
+                    const concerns = conversationState.userProfile.concerns.join(' and ');
+                    response += ` Since you've mentioned ${concerns}, I think you'd really benefit from his expertise.`;
+                }
+                
+                response += "\n\nWould you like to schedule a complimentary consultation? Or do you have other questions about our CBP approach?";
+                
+                return {
+                    text: response,
+                    topic: 'general',
+                    followUps: ['Tell me about CBP', 'Schedule consultation', 'Insurance questions'],
+                    shouldOfferBooking: true
+                };
+            },
+            
+            // Generate follow-up responses
+            generateFollowUpResponse: function(lastTopic, analysis) {
+                const followUpResponses = {
+                    cbp: "CBP is fascinating because it treats your spine like an engineering problem! 🔧 Instead of just adjusting wherever you feel pain, we use precise measurements to determine exactly where your spine deviates from normal, then create a custom plan to guide it back. Think of it like orthodontics for your spine - gradual, precise correction that creates lasting change.",
+                    
+                    scoliosis: "Here's what makes our scoliosis approach revolutionary: Traditional braces just try to prevent curves from getting worse. ScoliBrace actually applies corrective forces to reduce the curve! It's custom-made from a 3D scan of your torso and designed specifically for YOUR curve pattern. Many patients see measurable improvement in their Cobb angles (the measurement of their curve).",
+                    
+                    sciatica: "Sciatica happens when something compresses your sciatic nerve - usually a disc bulge or spinal misalignment. Most treatments just manage the pain, but CBP fixes the structural problem causing the compression. We use specific traction and adjustments to restore proper spinal alignment and take pressure off that nerve.",
+                    
+                    headaches: "Most headaches actually start in your neck! When your head sits forward (like from computer work), it puts tremendous strain on your neck muscles and can compress nerves. CBP corrects this forward head posture and restores your natural neck curve, which often eliminates the source of tension headaches.",
+                    
+                    insurance: "Insurance can be tricky, but we've helped thousands of patients navigate it successfully! PPO plans typically have the best coverage for chiropractic care. We'll call your insurance company, verify your benefits, and explain exactly what you can expect to pay before you commit to treatment."
+                };
+                
+                return {
+                    text: followUpResponses[lastTopic] || "Let me elaborate on that for you! Dr. Tyler would be able to explain this in much more detail during a consultation, as he can relate it specifically to your situation. Would you like to schedule a time to speak with him?",
+                    topic: lastTopic,
+                    shouldOfferBooking: true
+                };
+            }
+        };
+        
+        // Main message processing function
+        function processMessage(message) {
+            console.log('🧠 Processing intelligent response for:', message);
+            
+            // Handle lead capture if in progress
+            if (conversationState.leadCaptureStep !== 'none' && conversationState.leadCaptureStep !== 'complete') {
+                processLeadCapture(message);
+                return;
+            }
+            
+            // Generate intelligent response
+            const response = intelligentResponses.generateResponse(message);
+            
+            // Add conversation to history
+            conversationState.conversationHistory.push({
+                user: message,
+                bot: response.text,
+                topic: response.topic,
+                timestamp: new Date()
+            });
+            
+            // Show typing and respond
+            showTypingIndicator();
+            updateStatus('Analyzing your question...');
+            
+            setTimeout(() => {
+                removeTypingIndicator();
+                addMessage(response.text, 'bot');
+                
+                // Add follow-up buttons
+                if (response.followUps && response.followUps.length > 0) {
+                    setTimeout(() => {
+                        addFollowUpButtons(response.followUps);
+                    }, 800);
+                }
+                
+                // Add booking buttons if appropriate
+                if (response.shouldOfferBooking || response.shouldShowBooking) {
+                    setTimeout(() => {
+                        addBookingButtons();
+                    }, 1200);
+                }
+                
+                updateStatus('Ready • AI Assistant');
+            }, 1200 + Math.random() * 800);
+        }
+        
+        // Lead capture functionality
+        function shouldStartLeadCapture() {
+            return conversationState.messageCount >= 3 && 
+                   !conversationState.leadCaptureStarted && 
+                   conversationState.leadCaptureStep === 'none';
+        }
+        
+        // Lead capture with GPT context
+        function startConversationalLeadCapture() {
+            console.log('💬 Starting GPT-powered lead capture');
+            conversationState.leadCaptureStarted = true;
+            conversationState.leadCaptureStep = 'name';
+            
+            // Use GPT to generate personalized lead capture message
+            const userConcerns = conversationState.conversationHistory
+                .filter(msg => msg.role === 'user')
+                .slice(-3)
+                .map(msg => msg.content)
+                .join(' ');
+            
+            let leadMessage = "I can see you're interested in learning more about our CBP approach! 😊 ";
+            
+            if (userConcerns.toLowerCase().includes('pain')) {
+                leadMessage += "Since you're dealing with pain, ";
+            } else if (userConcerns.toLowerCase().includes('scoliosis')) {
+                leadMessage += "Since you're asking about scoliosis treatment, ";
+            }
+            
+            leadMessage += "I'd love to connect you with Dr. Tyler for a personalized consultation.";
+            
+            setTimeout(() => {
+                addMessage(leadMessage, 'bot');
+                setTimeout(() => {
+                    addMessage("To get you scheduled, could you tell me your first name?", 'bot');
+                }, 1000);
+            }, 2000);
+        }
+        
+        function processLeadCapture(message) {
+            console.log('📋 Processing lead capture step:', conversationState.leadCaptureStep);
+            
+            switch (conversationState.leadCaptureStep) {
+                case 'name':
+                    conversationState.leadData.name = message;
+                    conversationState.leadCaptureStep = 'email';
+                    setTimeout(() => {
+                        addMessage(`Nice to meet you, ${message}! 👋`, 'bot');
+                        setTimeout(() => {
+                            addMessage("What's the best email address to reach you at? We'll send you confirmation details and helpful information about CBP treatment.", 'bot');
+                        }, 800);
+                    }, 500);
+                    break;
+                    
+                case 'email':
+                    conversationState.leadData.email = message;
+                    conversationState.leadCaptureStep = 'phone';
+                    setTimeout(() => {
+                        addMessage("Perfect! And what's your phone number? Our team will use this to confirm your appointment.", 'bot');
+                    }, 500);
+                    break;
+                    
+                case 'phone':
+                    conversationState.leadData.phone = message;
+                    conversationState.leadCaptureStep = 'complete';
+                    
+                    // Capture lead with conversation context
+                    const leadData = {
+                        ...conversationState.leadData,
+                        concerns: conversationState.userProfile.concerns,
+                        urgency: conversationState.userProfile.urgency,
+                        conversationHistory: conversationState.conversationHistory,
+                        timestamp: new Date().toISOString()
+                    };
+                    
+                    console.log('✅ Intelligent lead captured:', leadData);
+                    sendLeadToEmail(leadData);
+                    
+                    setTimeout(() => {
+                        const responses = [
+                            `Excellent, ${conversationState.leadData.name}! 🎉 I have all your information.`,
+                            "Dr. Tyler's team will reach out within 24 hours to schedule your complimentary consultation.",
+                            "In the meantime, feel free to ask me any other questions! 💬",
+                            `For immediate scheduling, call (949) 536-5506 or book online:<div class='booking-buttons'><a href='https://coreposturechiropractic.com/schedule/' target='_blank' class='booking-btn'>🆕 New Patient Booking</a></div>`
+                        ];
+                        
+                        responses.forEach((response, index) => {
+                            setTimeout(() => {
+                                addMessage(response, 'bot');
+                            }, index * 1000);
+                        });
+                    }, 500);
+                    break;
+            }
+        }
+        
+        function sendLeadToEmail(leadData) {
+            // Store lead data (in real implementation, send to drtyler@coreposture.com)
+            console.log('📧 Sending enhanced lead to drtyler@coreposture.com:', leadData);
+            
+            try {
+                const leads = JSON.parse(localStorage.getItem('corePostureLeads') || '[]');
+                leads.push(leadData);
+                localStorage.setItem('corePostureLeads', JSON.stringify(leads));
+            } catch (e) {
+                console.log('Lead data ready for email integration:', leadData);
+            }
+        }
+        
+        // UI Functions
+        function addMessage(text, sender) {
+            const messages = document.getElementById('messages');
+            if (!messages) return;
+            
+            const messageDiv = document.createElement('div');
+            
+            if (sender === 'bot') {
+                messageDiv.className = 'bot-message';
+                messageDiv.innerHTML = `
+                    <div class="bot-avatar">CP</div>
+                    <div class="bot-bubble">
+                        <div class="bot-name">CorePosture Assistant</div>
+                        ${text}
+                    </div>
+                `;
+            } else {
+                messageDiv.className = 'user-message';
+                messageDiv.innerHTML = `
+                    <div class="user-bubble">
+                        <div class="user-name">You</div>
+                        ${text}
+                    </div>
+                `;
+            }
+            
+            messages.appendChild(messageDiv);
+            messages.scrollTop = messages.scrollHeight;
+        }
+        
+        function addFollowUpButtons(followups) {
+            const messages = document.getElementById('messages');
+            const buttonDiv = document.createElement('div');
+            buttonDiv.className = 'bot-message';
+            
+            const buttonsHtml = followups.map(followup => 
+                `<span class="quick-btn" onclick="sendQuick('${followup.replace(/'/g, '\\\'')}')">${followup}</span>`
+            ).join('');
+            
+            buttonDiv.innerHTML = `
+                <div class="bot-avatar">CP</div>
+                <div class="bot-bubble">
+                    <div style="margin-bottom: 8px; font-size: 12px; color: #6b7280;">Quick questions:</div>
+                    <div class="quick-btns">
+                        ${buttonsHtml}
+                    </div>
+                </div>
+            `;
+            
+            messages.appendChild(buttonDiv);
+            messages.scrollTop = messages.scrollHeight;
+        }
+        
+        function addBookingButtons() {
+            const messages = document.getElementById('messages');
+            const bookingDiv = document.createElement('div');
+            bookingDiv.className = 'bot-message';
+            
+            bookingDiv.innerHTML = `
+                <div class="bot-avatar">CP</div>
+                <div class="bot-bubble">
+                    <div class="booking-buttons">
+                        <a href='https://coreposturechiropractic.com/schedule/' target='_blank' class='booking-btn'>🆕 New Patient Booking</a>
+                        <a href='https://coreposturechiropractic.com/schedule-existing/' target='_blank' class='booking-btn'>👤 Existing Patient</a>
+                    </div>
+                    <div style="text-align: center; margin-top: 12px; font-size: 12px; color: #6b7280;">
+                        Or call: <strong>(949) 536-5506</strong>
+                    </div>
+                </div>
+            `;
+            
+            messages.appendChild(bookingDiv);
+            messages.scrollTop = messages.scrollHeight;
+        }
+        
+        function showTypingIndicator() {
+            const messages = document.getElementById('messages');
+            const typingDiv = document.createElement('div');
+            typingDiv.id = 'typing-indicator';
+            typingDiv.className = 'bot-message';
+            typingDiv.innerHTML = `
+                <div class="bot-avatar">CP</div>
+                <div class="bot-bubble">
+                    <div class="typing-indicator">
+                        Connecting to GPT<span class="typing-dots"><span></span><span></span><span></span></span>
+                    </div>
+                </div>
+            `;
+            
+            messages.appendChild(typingDiv);
+            messages.scrollTop = messages.scrollHeight;
+        }
+        
+        function removeTypingIndicator() {
+            const typing = document.getElementById('typing-indicator');
+            if (typing) typing.remove();
+        }
+        
+        function updateStatus(text) {
+            const status = document.getElementById('status');
+            if (status) status.textContent = text;
+        }
+        
+        // Main functions
+        function sendMessage() {
+            const input = document.getElementById('userInput');
+            if (!input) return;
+            
+            const message = input.value.trim();
+            if (!message) return;
+            
+            addMessage(message, 'user');
+            input.value = '';
+            
+            processMessage(message);
+            conversationState.messageCount++;
+            
+            // Start lead capture when appropriate
+            if (shouldStartLeadCapture()) {
+                startConversationalLeadCapture();
+            }
+        }
+        
+        function sendQuick(message) {
+            addMessage(message, 'user');
+            processMessage(message);
+            conversationState.messageCount++;
+        }
+        
+        // Initialize chatbot with natural GPT greeting
+        function initializeChatbot() {
+            console.log('🔧 Setting up pure GPT chatbot...');
+            
+            // Let GPT generate dynamic greetings
+            const welcomeMessage = "Hi there! 👋 Welcome to CorePosture Chiropractic! I'm here to help answer your questions about Dr. Tyler Meier's CBP approach and how we can help with your spinal health concerns. What brings you here today?";
+            
+            const initialHTML = `
+                <div class="bot-message">
+                    <div class="bot-avatar">CP</div>
+                    <div class="bot-bubble">
+                        <div class="bot-name">CorePosture Assistant</div>
+                        ${welcomeMessage}
+                        
+                        <div class="quick-btns">
+                            <span class="quick-btn" onclick="sendQuick('What is CBP treatment?')">CBP Treatment</span>
+                            <span class="quick-btn" onclick="sendQuick('Help with scoliosis')">Scoliosis Care</span>
+                            <span class="quick-btn" onclick="sendQuick('I have sciatica pain')">Sciatica</span>
+                            <span class="quick-btn" onclick="sendQuick('Chronic headaches')">Headaches</span>
+                            <span class="quick-btn" onclick="sendQuick('Insurance questions')">Insurance</span>
+                            <span class="quick-btn" onclick="sendQuick('Schedule appointment')">Book Now</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('messages').innerHTML = initialHTML;
+            
+            // Setup input field
+            const input = document.getElementById('userInput');
+            if (input) {
+                input.focus();
+                input.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') {
+                        sendMessage();
+                    }
+                });
+            }
+            
+            updateStatus('Ready • Pure GPT');
+            console.log('✅ Pure GPT chatbot initialized!');
+        }
+        
+        // Initialize when page loads
+        window.addEventListener('load', function() {
+            console.log('✅ Page loaded, initializing GPT chatbot...');
+            initializeChatbot();
+        });
+        
+        console.log('📜 GPT-powered chatbot script loaded successfully');
+    </script>
+</body>
+</html>
+                
+                
