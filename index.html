@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CorePosture Chiropractic Chatbot</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 400;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        
+        .chatbot {
+            width: 420px;
+            height: 650px;
+            background: #ffffff;
+            border-radius: 24px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08), 0 8px 16px rgba(0, 0, 0, 0.04);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #2d5aa0 0%, #1e3c72 100%);
+            color: white;
+            padding: 32px 24px 28px 24px;
+            text-align: center;
+            position: relative;
+        }
+        
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 100%);
+            pointer-events: none;
+        }
+        
+        .header h2 {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 600;
+            font-size: 20px;
+            margin-bottom: 4px;
+            letter-spacing: -0.02em;
+        }
+        
+        .header p {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 400;
+            font-size: 14px;
+            opacity: 0.9;
+            letter-spacing: 0.01em;
+        }
+        
+        .status-dot {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 10px;
+            height: 10px;
+            background: #10b981;
+            border-radius: 50%;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.2); opacity: 0.8; }
+        }
+        
+        .messages {
+            flex: 1;
+            padding: 24px 20px;
+            overflow-y: auto;
+            background: #fafbfc;
+            background-image: 
+                radial-gradient(circle at 1px 1px, rgba(45, 90, 160, 0.02) 1px, transparent 0);
+            background-size: 20px 20px;
+        }
+        
+        .messages::-webkit-scrollbar {
+            width: 4px;
+        }
+        
+        .messages::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        
+        .messages::-webkit-scrollbar-thumb {
+            background: rgba(45, 90, 160, 0.2);
+            border-radius: 2px;
+        }
+        
+        .message {
+            margin: 16px 0;
+            animation: fadeInUp 0.4s ease-out;
+        }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(16px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .bot-message {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 20px;
+        }
+        
+        .bot-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #2d5aa0, #1e3c72);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 600;
+            font-size: 12px;
+            margin-right: 12px;
+            flex-shrink: 0;
+            box-shadow: 0 2px 8px rgba(45, 90, 160, 0.3);
+        }
+        
+        .bot-bubble {
+            background: #ffffff;
+            padding: 16px 20px;
+            border-radius: 20px 20px 20px 4px;
+            max-width: 80%;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+            border: 1px solid rgba(45, 90, 160, 0.06);
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 400;
+            font-size: 14px;
+            line-height: 1.5;
+            color: #374151;
+        }
+        
+        .user-message {
+            display: flex;
+            justify-content: flex-end;
+            margin-bottom: 20px;
+        }
+        
+        .user-bubble {
+            background: linear-gradient(135deg, #2d5aa0, #1e3c72);
+            color: white;
+            padding: 16px 20px;
+            border-radius: 20px 20px 4px 20px;
+            max-width: 80%;
+            box-shadow: 0 2px 12px rgba(45, 90, 160, 0.3);
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 400;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+        
+        .booking-buttons {
+            margin: 16px 0 8px 0;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        
+        .booking-btn {
+            background: linear-gradient(135deg, #dc2626, #b91c1c);
+            color: white;
+            border: none;
+            padding: 14px 20px;
+            border-radius: 16px;
+            cursor: pointer;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 500;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(220, 38, 38, 0.25);
+        }
+        
+        .booking-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(220, 38, 38, 0.35);
+        }
+        
+        .quick-btns {
+            margin: 16px 0 8px 0;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        
+        .quick-btn {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            padding: 8px 14px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 500;
+            font-size: 12px;
+            color: #495057;
+            transition: all 0.2s ease;
+        }
+        
+        .quick-btn:hover {
+            background: #e9ecef;
+            border-color: #2d5aa0;
+            color: #2d5aa0;
+            transform: translateY(-1px);
+        }
+        
+        .input-area {
+            padding: 20px 24px 24px 24px;
+            background: #ffffff;
+            border-top: 1px solid #f1f3f4;
+        }
+        
+        .input-wrapper {
+            display: flex;
+            align-items: center;
+            background: #f8f9fa;
+            border-radius: 24px;
+            padding: 4px;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+        
+        .input-wrapper:focus-within {
+            background: #ffffff;
+            border-color: #2d5aa0;
+            box-shadow: 0 0 0 4px rgba(45, 90, 160, 0.1);
+        }
+        
+        .input-field {
+            flex: 1;
+            border: none;
+            background: transparent;
+            padding: 14px 20px;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 400;
+            font-size: 14px;
+            outline: none;
+            color: #374151;
+        }
+        
+        .input-field::placeholder {
+            color: #9ca3af;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 400;
+        }
+        
+        .send-btn {
+            background: linear-gradient(135deg, #2d5aa0, #1e3c72);
+            color: white;
+            border: none;
+            width: 44px;
+            height: 44px;
+            border-radius: 22px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            font-size: 16px;
+            margin: 2px;
+            box-shadow: 0 2px 8px rgba(45, 90, 160, 0.3);
+        }
+        
+        .send-btn:hover:not(:disabled) {
+            transform: scale(1.05);
+            box-shadow: 0 4px 16px rgba(45, 90, 160, 0.4);
+        }
+        
+        .send-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .status {
+            color: #6b7280;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 400;
+            font-size: 11px;
+            text-align: center;
+            padding: 8px 16px 0 16px;
+            letter-spacing: 0.02em;
+        }
+        
+        .bot-name {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 600;
+            color: #2d5aa0;
+            margin-bottom: 4px;
+            font-size: 13px;
+        }
+        
+        .user-name {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.9);
+            margin-bottom: 4px;
+            font-size: 13px;
+        }
+        
+        /* Mobile responsiveness */
+        @media (max-width: 480px) {
+            body {
+                padding: 0;
+            }
+            
+            .chatbot {
+                width: 100vw;
+                height: 100vh;
+                border-radius: 0;
+            }
+            
+            .header {
+                padding: 40px 24px 32px 24px;
+            }
+            
+            .messages {
+                padding: 20px 16px;
+            }
+            
+            .input-area {
+                padding: 16px 20px 32px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="chatbot">
+        <div class="header">
+            <h2>CorePosture Chiropractic</h2>
+            <p>Newport Beach, CA • AI Assistant</p>
+        </div>
+        
+        <div class="messages" id="messages">
+            <!-- Welcome message will be added by JavaScript -->
+        </div>
+        
+        <div class="input-area">
+            <div class="input-wrapper">
+                <input type="text" id="userInput" class="input-field" placeholder="Ask me anything about CorePosture..." onkeypress="if(event.key==='Enter') sendMessage()">
+                <button onclick="sendMessage()" class="send-btn">
+                    ➤
+                </button>
+            </div>
+        </div>
+        
+        <div class="status" id="status">Ready • AI Assistant</div>
+    </div>
+
+    <script>
+        console.log('🚀 Chatbot script starting...');
+        
+        // Wait for page to fully load
+        window.addEventListener('load', function() {
+            console.log('✅ Page loaded, initializing chatbot...');
+            initializeChatbot();
+        });
+        
+        function initializeChatbot() {
+            console.log('🔧 Setting up chatbot...');
+            
+            // Add welcome message
+            const welcomeMessage = `
+                <div class="bot-message">
+                    <div class="bot-avatar">CP</div>
+                    <div class="bot-bubble">
+                        <div class="bot-name">CorePosture Assistant</div>
+                        Hi! 👋 Welcome to CorePosture Chiropractic in Newport Beach! I can help with questions about CBP treatment, scoliosis care, insurance, and scheduling. How can I help you today?
+                        
+                        <div class="quick-btns">
+                            <span class="quick-btn" onclick="sendQuick('What is CBP?')">CBP Treatment</span>
+                            <span class="quick-btn" onclick="sendQuick('Scoliosis help')">Scoliosis</span>
+                            <span class="quick-btn" onclick="sendQuick('Insurance')">Insurance</span>
+                            <span class="quick-btn" onclick="sendQuick('Book appointment')">Book Now</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('messages').innerHTML = welcomeMessage;
+            
+            // Setup input field
+            const input = document.getElementById('userInput');
+            if (input) {
+                input.focus();
+                input.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') {
+                        console.log('📝 Enter key pressed');
+                        sendMessage();
+                    }
+                });
+            }
+            
+            console.log('✅ Chatbot initialized successfully!');
+        }
+        
+        // Simple responses
+        const responses = {
+            'cbp': "CBP (Chiropractic BioPhysics®) is our specialty! 📊 Dr. Tyler Meier is one of only a handful of CBP-certified practitioners in California. We use digital X-ray analysis and customized treatment plans. Call 949-536-5506 for your complimentary consultation! 🎯",
+            
+            'scoliosis': "Yes! We specialize in scoliosis treatment using ScoliBrace technology! 🌟 Unlike traditional bracing, ScoliBrace works to CORRECT spinal curves. Even orthopedic surgeons refer patients to us. Call 949-536-5506 for your complimentary consultation! 📏",
+            
+            'insurance': "Most of our patients with PPO insurance are able to get reimbursed for their care 🙌. We'll verify your benefits with you at your first visit so you know exactly what's covered. Would you like me to help you get scheduled?",
+            
+            'appointment': "I'd love to help you schedule! 📅 Please choose:<div class='booking-buttons'><a href='https://coreposturechiropractic.com/schedule/' target='_blank' class='booking-btn'>🆕 New Patient</a><a href='https://coreposturechiropractic.com/schedule-existing/' target='_blank' class='booking-btn'>👤 Existing Patient</a></div>Or call 949-536-5506!",
+            
+            'book': "I'd love to help you schedule! 📅 Please choose:<div class='booking-buttons'><a href='https://coreposturechiropractic.com/schedule/' target='_blank' class='booking-btn'>🆕 New Patient</a><a href='https://coreposturechiropractic.com/schedule-existing/' target='_blank' class='booking-btn'>👤 Existing Patient</a></div>Or call 949-536-5506!"
+        };
+        
+        let messageCount = 0;
+        let leadCapture = {
+            active: false,
+            step: 'none', // 'name', 'email', 'phone', 'complete'
+            data: {}
+        };
+        
+        function sendMessage() {
+            console.log('📤 sendMessage() called');
+            
+            const input = document.getElementById('userInput');
+            if (!input) {
+                console.error('❌ Input field not found');
+                return;
+            }
+            
+            const message = input.value.trim();
+            console.log('📝 Message:', message);
+            
+            if (!message) {
+                console.log('⚠️ Empty message, skipping');
+                return;
+            }
+            
+            addMessage(message, 'user');
+            input.value = '';
+            
+            // Show typing
+            document.getElementById('status').textContent = 'Thinking...';
+            
+            setTimeout(() => {
+                if (leadCapture.active) {
+                    processLeadCapture(message);
+                } else {
+                    processMessage(message);
+                }
+                document.getElementById('status').textContent = 'Ready • Basic Mode';
+            }, 800);
+            
+            messageCount++;
+            
+            // Start conversational lead capture after 3 messages
+            if (messageCount >= 3 && !leadCapture.active && leadCapture.step === 'none') {
+                setTimeout(() => {
+                    startConversationalLeadCapture();
+                }, 2000);
+            }
+        }
+        
+        function startConversationalLeadCapture() {
+            console.log('💬 Starting conversational lead capture');
+            leadCapture.active = true;
+            leadCapture.step = 'name';
+            
+            const messages = [
+                "I'd love to help connect you with our Newport Beach team! 😊",
+                "To get you scheduled with Dr. Tyler, could you tell me your name?"
+            ];
+            
+            messages.forEach((msg, index) => {
+                setTimeout(() => {
+                    addMessage(msg, 'bot');
+                }, index * 1000);
+            });
+        }
+        
+        function processLeadCapture(message) {
+            console.log('📋 Processing lead capture step:', leadCapture.step);
+            
+            switch (leadCapture.step) {
+                case 'name':
+                    leadCapture.data.name = message;
+                    leadCapture.step = 'email';
+                    addMessage(`Nice to meet you, ${message}! 👋 What's the best email address to reach you at?`, 'bot');
+                    break;
+                    
+                case 'email':
+                    leadCapture.data.email = message;
+                    leadCapture.step = 'phone';
+                    addMessage(`Perfect! And what's your phone number? We'll use this to confirm your appointment.`, 'bot');
+                    break;
+                    
+                case 'phone':
+                    leadCapture.data.phone = message;
+                    leadCapture.step = 'complete';
+                    leadCapture.active = false;
+                    
+                    console.log('✅ Lead captured:', leadCapture.data);
+                    
+                    setTimeout(() => {
+                        const responses = [
+                            `Excellent, ${leadCapture.data.name}! 🎉 I have all your information.`,
+                            "Our Newport Beach team will reach out within 24 hours to schedule your complimentary consultation.",
+                            "In the meantime, feel free to ask me any other questions about CBP treatment or scoliosis care!",
+                            `For immediate scheduling, you can call us at 949-536-5506 or book online:<div class='booking-buttons'><a href='https://coreposturechiropractic.com/schedule/' target='_blank' class='booking-btn'>🆕 New Patient</a><a href='https://coreposturechiropractic.com/schedule-existing/' target='_blank' class='booking-btn'>👤 Existing Patient</a></div>`
+                        ];
+                        
+                        responses.forEach((response, index) => {
+                            setTimeout(() => {
+                                addMessage(response, 'bot');
+                            }, index * 1200);
+                        });
+                    }, 500);
+                    break;
+            }
+        }
+        
+        function sendQuick(message) {
+            console.log('⚡ Quick message:', message);
+            addMessage(message, 'user');
+            setTimeout(() => {
+                if (leadCapture.active) {
+                    processLeadCapture(message);
+                } else {
+                    processMessage(message);
+                }
+            }, 800);
+            messageCount++;
+        }
+        
+        function processMessage(message) {
+            console.log('🧠 Processing message:', message);
+            const lower = message.toLowerCase();
+            let response = '';
+            
+            // Find matching response
+            for (const [key, value] of Object.entries(responses)) {
+                if (lower.includes(key)) {
+                    response = value;
+                    console.log('✅ Found response for:', key);
+                    break;
+                }
+            }
+            
+            // Default responses
+            if (!response) {
+                if (lower.includes('hello') || lower.includes('hi')) {
+                    response = "Hello! 👋 Thanks for contacting CorePosture Chiropractic in Newport Beach! We specialize in CBP treatment. How can I help you today? 🌟";
+                } else if (lower.includes('pain') || lower.includes('back') || lower.includes('neck')) {
+                    response = "I understand you're dealing with pain. 😔 Our CBP approach targets the root cause through spinal correction. Call 949-536-5506 for your complimentary consultation to see how we can help! 💪";
+                } else {
+                    response = "That's a great question! 🤔 For detailed information about your specific situation, please call our Newport Beach office at 949-536-5506. Our team specializes in CBP treatment. What else can I help you with? 📞";
+                }
+            }
+            
+            addMessage(response, 'bot');
+        }
+        
+        function addMessage(text, sender) {
+            console.log('💬 Adding message:', sender, text.substring(0, 50) + '...');
+            
+            const messages = document.getElementById('messages');
+            if (!messages) {
+                console.error('❌ Messages container not found');
+                return;
+            }
+            
+            const messageDiv = document.createElement('div');
+            
+            if (sender === 'bot') {
+                messageDiv.className = 'bot-message';
+                messageDiv.innerHTML = `
+                    <div class="bot-avatar">CP</div>
+                    <div class="bot-bubble">
+                        <div class="bot-name">CorePosture</div>
+                        ${text}
+                    </div>
+                `;
+            } else {
+                messageDiv.className = 'user-message';
+                messageDiv.innerHTML = `
+                    <div class="user-bubble">
+                        <div class="user-name">You</div>
+                        ${text}
+                    </div>
+                `;
+            }
+            
+            messages.appendChild(messageDiv);
+            messages.scrollTop = messages.scrollHeight;
+            console.log('✅ Message added successfully');
+        }
+        
+        // Remove the old popup form functions
+        // No longer needed since we're using conversational lead capture
+        
+        // Test function to verify JavaScript is working
+        function testBot() {
+            console.log('🧪 Test function called - JavaScript is working!');
+            addMessage('Test message - JavaScript is working!', 'bot');
+        }
+        
+        console.log('📜 Script loaded successfully');
+    </script>
+</body>
+</html>
