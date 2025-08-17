@@ -1,0 +1,1271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CorePosture Chiropractic AI Assistant - Enhanced</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* Keep ALL your existing CSS exactly the same */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 400;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        
+        .chatbot {
+            width: 420px;
+            height: 700px;
+            background: #ffffff;
+            border-radius: 24px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08), 0 8px 16px rgba(0, 0, 0, 0.04);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #2d5aa0 0%, #1e3c72 100%);
+            color: white;
+            padding: 32px 24px 28px 24px;
+            text-align: center;
+            position: relative;
+        }
+        
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 100%);
+            pointer-events: none;
+        }
+        
+        .header h2 {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 600;
+            font-size: 20px;
+            margin-bottom: 4px;
+            letter-spacing: -0.02em;
+        }
+        
+        .header p {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 400;
+            font-size: 14px;
+            opacity: 0.9;
+            letter-spacing: 0.01em;
+        }
+        
+        .status-dot {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 10px;
+            height: 10px;
+            background: #10b981;
+            border-radius: 50%;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.2); opacity: 0.8; }
+        }
+        
+        .messages {
+            flex: 1;
+            padding: 24px 20px;
+            overflow-y: auto;
+            background: #fafbfc;
+            background-image: 
+                radial-gradient(circle at 1px 1px, rgba(45, 90, 160, 0.02) 1px, transparent 0);
+            background-size: 20px 20px;
+        }
+        
+        .messages::-webkit-scrollbar {
+            width: 4px;
+        }
+        
+        .messages::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        
+        .messages::-webkit-scrollbar-thumb {
+            background: rgba(45, 90, 160, 0.2);
+            border-radius: 2px;
+        }
+        
+        .message {
+            margin: 16px 0;
+            animation: fadeInUp 0.4s ease-out;
+        }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(16px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .bot-message {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 20px;
+        }
+        
+        .bot-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #2d5aa0, #1e3c72);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 600;
+            font-size: 12px;
+            margin-right: 12px;
+            flex-shrink: 0;
+            box-shadow: 0 2px 8px rgba(45, 90, 160, 0.3);
+        }
+        
+        .bot-bubble {
+            background: #ffffff;
+            padding: 16px 20px;
+            border-radius: 20px 20px 20px 4px;
+            max-width: 80%;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+            border: 1px solid rgba(45, 90, 160, 0.06);
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 400;
+            font-size: 14px;
+            line-height: 1.5;
+            color: #374151;
+        }
+        
+        .user-message {
+            display: flex;
+            justify-content: flex-end;
+            margin-bottom: 20px;
+        }
+        
+        .user-bubble {
+            background: linear-gradient(135deg, #2d5aa0, #1e3c72);
+            color: white;
+            padding: 16px 20px;
+            border-radius: 20px 20px 4px 20px;
+            max-width: 80%;
+            box-shadow: 0 2px 12px rgba(45, 90, 160, 0.3);
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 400;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+        
+        .booking-buttons {
+            margin: 16px 0 8px 0;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        
+        .booking-btn {
+            background: linear-gradient(135deg, #dc2626, #b91c1c);
+            color: white;
+            border: none;
+            padding: 14px 20px;
+            border-radius: 16px;
+            cursor: pointer;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 500;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(220, 38, 38, 0.25);
+        }
+        
+        .booking-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(220, 38, 38, 0.35);
+        }
+        
+        .quick-btns {
+            margin: 16px 0 8px 0;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        
+        .quick-btn {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            padding: 8px 14px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 500;
+            font-size: 12px;
+            color: #495057;
+            transition: all 0.2s ease;
+        }
+        
+        .quick-btn:hover {
+            background: #e9ecef;
+            border-color: #2d5aa0;
+            color: #2d5aa0;
+            transform: translateY(-1px);
+        }
+        
+        .input-area {
+            padding: 20px 24px 24px 24px;
+            background: #ffffff;
+            border-top: 1px solid #f1f3f4;
+        }
+        
+        .input-wrapper {
+            display: flex;
+            align-items: center;
+            background: #f8f9fa;
+            border-radius: 24px;
+            padding: 4px;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+        
+        .input-wrapper:focus-within {
+            background: #ffffff;
+            border-color: #2d5aa0;
+            box-shadow: 0 0 0 4px rgba(45, 90, 160, 0.1);
+        }
+        
+        .input-field {
+            flex: 1;
+            border: none;
+            background: transparent;
+            padding: 14px 20px;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 400;
+            font-size: 14px;
+            outline: none;
+            color: #374151;
+        }
+        
+        .input-field::placeholder {
+            color: #9ca3af;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 400;
+        }
+        
+        .send-btn {
+            background: linear-gradient(135deg, #2d5aa0, #1e3c72);
+            color: white;
+            border: none;
+            width: 44px;
+            height: 44px;
+            border-radius: 22px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            font-size: 16px;
+            margin: 2px;
+            box-shadow: 0 2px 8px rgba(45, 90, 160, 0.3);
+        }
+        
+        .send-btn:hover:not(:disabled) {
+            transform: scale(1.05);
+            box-shadow: 0 4px 16px rgba(45, 90, 160, 0.4);
+        }
+        
+        .send-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .status {
+            color: #6b7280;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 400;
+            font-size: 11px;
+            text-align: center;
+            padding: 8px 16px 0 16px;
+            letter-spacing: 0.02em;
+        }
+        
+        .bot-name {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 600;
+            color: #2d5aa0;
+            margin-bottom: 4px;
+            font-size: 13px;
+        }
+        
+        .user-name {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.9);
+            margin-bottom: 4px;
+            font-size: 13px;
+        }
+        
+        .typing-indicator {
+            display: flex;
+            align-items: center;
+            padding: 8px 0;
+            color: #6b7280;
+            font-size: 12px;
+            font-style: italic;
+        }
+        
+        .typing-dots {
+            display: inline-flex;
+            margin-left: 8px;
+        }
+        
+        .typing-dots span {
+            height: 4px;
+            width: 4px;
+            background: #6b7280;
+            border-radius: 50%;
+            display: inline-block;
+            margin: 0 1px;
+            animation: typing 1.4s infinite;
+        }
+        
+        .typing-dots span:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+        
+        .typing-dots span:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+        
+        @keyframes typing {
+            0%, 60%, 100% { transform: translateY(0); }
+            30% { transform: translateY(-10px); }
+        }
+        
+        /* Mobile responsiveness */
+        @media (max-width: 480px) {
+            body {
+                padding: 0;
+            }
+            
+            .chatbot {
+                width: 100vw;
+                height: 100vh;
+                border-radius: 0;
+            }
+            
+            .header {
+                padding: 40px 24px 32px 24px;
+            }
+            
+            .messages {
+                padding: 20px 16px;
+            }
+            
+            .input-area {
+                padding: 16px 20px 32px 20px;
+            }
+        }
+
+        /* Add this new style for AI mode indicator */
+        .ai-mode-indicator {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            padding: 4px 8px;
+            border-radius: 8px;
+            font-size: 10px;
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body>
+    <div class="chatbot">
+        <div class="header">
+            <div class="status-dot"></div>
+            <div class="ai-mode-indicator" id="aiModeIndicator">🤖 AI Mode</div>
+            <h2>CorePosture Chiropractic</h2>
+            <p>Newport Beach, CA • AI Assistant</p>
+        </div>
+        
+        <div class="messages" id="messages">
+            <!-- Messages will be added by JavaScript -->
+        </div>
+        
+        <div class="input-area">
+            <div class="input-wrapper">
+                <input type="text" id="userInput" class="input-field" placeholder="Ask me anything about CorePosture..." onkeypress="if(event.key==='Enter') sendMessage()">
+                <button onclick="sendMessage()" class="send-btn">
+                    ➤
+                </button>
+            </div>
+        </div>
+        
+        <div class="status" id="status">Ready • AI Assistant</div>
+    </div>
+
+    <script>
+        console.log('🚀 Enhanced Conversational Chatbot starting...');
+        
+        // STEP 1: Add these new configuration variables at the top
+        const CONFIG = {
+            useAI: true, // Set to false to use your original system
+            apiEndpoint: 'https://your-worker.your-subdomain.workers.dev/api/chat', // Replace with your Cloudflare Worker URL
+            fallbackToOriginal: true // Use original system if AI fails
+        };
+        
+        // STEP 2: Your existing conversation state (keep this exactly as is)
+        let conversationState = {
+            messageCount: 0,
+            leadCaptureStarted: false,
+            leadCaptureStep: 'none',
+            leadData: {},
+            conversationHistory: [],
+            userProfile: {
+                concerns: [],
+                patientType: null,
+                painAreas: [],
+                previousTreatments: [],
+                urgency: 'normal'
+            },
+            currentTopics: []
+        };
+        
+        // STEP 3: New AI Chat System (add this)
+        class EnhancedChatSystem {
+            constructor() {
+                this.conversationHistory = [];
+                this.systemPrompt = this.buildSystemPrompt();
+                this.maxHistoryLength = 10;
+                this.leadCapture = new SmartLeadCapture();
+            }
+
+            buildSystemPrompt() {
+                return `You are an AI assistant for CorePosture Chiropractic in Newport Beach, CA. 
+
+PRACTICE INFORMATION:
+- Dr. Tyler Meier specializes in CBP (Chiropractic BioPhysics®)
+- Location: Newport Beach, CA
+- Phone: (949) 536-5506
+- Specialties: Scoliosis treatment with ScoliBrace, sciatica, headaches, posture correction
+- CBP is a research-based technique using precise spinal correction
+- New patients get complimentary consultations
+- Most PPO insurance accepted
+
+PERSONALITY & TONE:
+- Warm, professional, and knowledgeable
+- Use emojis occasionally for friendliness
+- Be conversational but informative
+- Always offer to schedule appointments when appropriate
+- Show empathy for pain/health concerns
+
+CONVERSATION RULES:
+1. Engage in natural conversation while staying on topic
+2. Ask follow-up questions to understand their needs
+3. Provide specific information about CBP and treatments
+4. Guide conversations toward scheduling when ready
+5. Handle general questions but redirect to health topics
+6. Be helpful with insurance, location, and practice questions
+
+LEAD CAPTURE:
+- After 3-4 meaningful exchanges, offer consultation
+- Collect name, email, phone naturally in conversation
+- Don't be pushy - let conversation flow naturally
+
+Remember: You're representing a real medical practice. Be accurate and professional.`;
+            }
+
+            async sendMessage(userMessage) {
+                try {
+                    this.conversationHistory.push({
+                        role: 'user',
+                        content: userMessage,
+                        timestamp: new Date()
+                    });
+
+                    const messages = this.prepareMessages();
+                    const response = await this.callAI(messages);
+                    
+                    this.conversationHistory.push({
+                        role: 'assistant',
+                        content: response,
+                        timestamp: new Date()
+                    });
+
+                    this.trimHistory();
+                    return response;
+
+                } catch (error) {
+                    console.error('AI API Error:', error);
+                    throw error; // Let the calling function handle fallback
+                }
+            }
+
+            prepareMessages() {
+                const messages = [
+                    { role: 'system', content: this.systemPrompt }
+                ];
+
+                this.conversationHistory.slice(-this.maxHistoryLength).forEach(msg => {
+                    messages.push({
+                        role: msg.role,
+                        content: msg.content
+                    });
+                });
+
+                return messages;
+            }
+
+            async callAI(messages) {
+                const response = await fetch(CONFIG.apiEndpoint, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        messages: messages,
+                        max_tokens: 300,
+                        temperature: 0.7
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`API request failed: ${response.status}`);
+                }
+
+                const data = await response.json();
+                return data.message || data.choices?.[0]?.message?.content || 'I apologize, but I encountered an issue. Please try again.';
+            }
+
+            trimHistory() {
+                if (this.conversationHistory.length > this.maxHistoryLength * 2) {
+                    this.conversationHistory = this.conversationHistory.slice(-this.maxHistoryLength);
+                }
+            }
+
+            shouldStartLeadCapture() {
+                return conversationState.messageCount >= 3 && 
+                       !this.leadCapture.isCapturing;
+            }
+        }
+
+        // STEP 4: Smart Lead Capture (add this)
+        class SmartLeadCapture {
+            constructor() {
+                this.isCapturing = false;
+                this.leadData = {};
+                this.step = 'none';
+            }
+
+            async processInput(input) {
+                if (!this.isCapturing) return null;
+
+                if (this.containsEmail(input)) {
+                    this.leadData.email = this.extractEmail(input);
+                }
+                if (this.containsPhone(input)) {
+                    this.leadData.phone = this.extractPhone(input);
+                }
+                if (!this.leadData.name && this.step === 'started') {
+                    this.leadData.name = input;
+                }
+
+                if (this.leadData.email && this.leadData.phone) {
+                    return this.completeLead();
+                }
+
+                return null; // Let AI continue the conversation
+            }
+
+            containsEmail(text) {
+                return /\S+@\S+\.\S+/.test(text);
+            }
+
+            containsPhone(text) {
+                return /[\d\-\(\)\+\s]{10,}/.test(text);
+            }
+
+            extractEmail(text) {
+                const match = text.match(/\S+@\S+\.\S+/);
+                return match ? match[0] : null;
+            }
+
+            extractPhone(text) {
+                const match = text.match(/[\d\-\(\)\+\s]{10,}/);
+                return match ? match[0].replace(/\D/g, '') : null;
+            }
+
+            start() {
+                this.isCapturing = true;
+                this.step = 'started';
+            }
+
+            completeLead() {
+                this.step = 'complete';
+                this.sendLead();
+                return `Perfect! I have your information. Dr. Tyler's team will contact you within 24 hours to schedule your complimentary consultation. For immediate scheduling, call (949) 536-5506.`;
+            }
+
+            async sendLead() {
+                try {
+                    await fetch(CONFIG.apiEndpoint.replace('/chat', '/leads'), {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            ...this.leadData,
+                            source: 'ai-chatbot',
+                            timestamp: new Date().toISOString()
+                        })
+                    });
+                } catch (error) {
+                    console.error('Failed to send lead:', error);
+                }
+            }
+        }
+
+        // STEP 5: Keep ALL your original intelligent responses (unchanged)
+        const intelligentResponses = {
+            // ... keep your entire existing intelligentResponses object exactly as it is
+            generateGreeting: function() {
+                const greetings = [
+                    "Hi there! 👋 Welcome to CorePosture Chiropractic! I'm here to help you understand how Dr. Tyler Meier's specialized CBP approach can help with your spinal health concerns.",
+                    "Hello! 😊 Thanks for visiting CorePosture Chiropractic in Newport Beach. I'd love to help you learn about our unique CBP treatment approach and how it might benefit you.",
+                    "Welcome! 🌟 I'm here to answer your questions about CorePosture Chiropractic and Dr. Tyler's expertise in CBP treatment and scoliosis care."
+                ];
+                return greetings[Math.floor(Math.random() * greetings.length)];
+            },
+
+            generateResponse: function(userMessage) {
+                const analysis = this.analyzeMessage(userMessage);
+                const context = this.getConversationContext();
+                
+                this.updateUserProfile(analysis);
+                
+                if (analysis.isFollowUp && context.lastTopic) {
+                    return this.generateFollowUpResponse(context.lastTopic, analysis);
+                }
+                
+                if (analysis.intent) {
+                    return this.generateIntentResponse(analysis.intent, analysis, context);
+                }
+                
+                return this.generateIntelligentFallback(analysis, context);
+            },
+
+            analyzeMessage: function(message) {
+                const msg = message.toLowerCase();
+                const analysis = {
+                    originalMessage: message,
+                    cleanMessage: msg,
+                    intent: null,
+                    sentiment: 'neutral',
+                    urgency: 'normal',
+                    painLevel: null,
+                    concerns: [],
+                    isFollowUp: false,
+                    needsDetails: false,
+                    isQuestionAboutResults: false,
+                    mentionsCost: false,
+                    mentionsTime: false
+                };
+                
+                const followUpPatterns = [
+                    'what does that mean', 'tell me more', 'can you explain', 'how does that work',
+                    'what do you mean', 'elaborate', 'more details', 'i don\'t understand',
+                    'can you clarify', 'what is that', 'how so', 'why is that'
+                ];
+                analysis.isFollowUp = followUpPatterns.some(pattern => msg.includes(pattern));
+                
+                const urgentWords = ['severe', 'intense', 'unbearable', 'emergency', 'can\'t take', 'desperate'];
+                const highPainWords = ['excruciating', '10/10', 'worst pain', 'can\'t sleep', 'can\'t work'];
+                
+                if (urgentWords.some(word => msg.includes(word))) {
+                    analysis.urgency = 'high';
+                    analysis.sentiment = 'distressed';
+                }
+                if (highPainWords.some(word => msg.includes(word))) {
+                    analysis.painLevel = 'severe';
+                    analysis.sentiment = 'distressed';
+                }
+                
+                const intentPatterns = {
+                    booking: {
+                        patterns: ['book', 'schedule', 'appointment', 'consultation', 'visit', 'come in', 'available times', 'when can i'],
+                        weight: 10
+                    },
+                    cbp: {
+                        patterns: ['cbp', 'chiropractic biophysics', 'what makes you different', 'your approach', 'technique'],
+                        weight: 9
+                    },
+                    scoliosis: {
+                        patterns: ['scoliosis', 'curved spine', 'spinal curve', 'scolibrace', 'spine curvature', 'back curved'],
+                        weight: 9
+                    },
+                    sciatica: {
+                        patterns: ['sciatica', 'sciatic', 'leg pain', 'shooting pain', 'pain down leg', 'nerve pain'],
+                        weight: 8
+                    },
+                    headaches: {
+                        patterns: ['headache', 'migraine', 'head pain', 'tension headache', 'neck headache'],
+                        weight: 8
+                    },
+                    backPain: {
+                        patterns: ['back pain', 'lower back', 'upper back', 'spine pain', 'disc', 'lumbar'],
+                        weight: 7
+                    },
+                    neckPain: {
+                        patterns: ['neck pain', 'cervical', 'stiff neck', 'neck problems', 'whiplash'],
+                        weight: 7
+                    },
+                    insurance: {
+                        patterns: ['insurance', 'cost', 'price', 'expensive', 'afford', 'covered', 'ppo', 'hmo'],
+                        weight: 6
+                    },
+                    results: {
+                        patterns: ['results', 'how long', 'when will', 'does it work', 'effective', 'success rate'],
+                        weight: 6
+                    },
+                    newPatient: {
+                        patterns: ['first time', 'new patient', 'never been', 'what to expect', 'first visit'],
+                        weight: 6
+                    }
+                };
+                
+                let bestMatch = { intent: null, score: 0 };
+                Object.entries(intentPatterns).forEach(([intent, config]) => {
+                    let score = 0;
+                    config.patterns.forEach(pattern => {
+                        if (msg.includes(pattern)) {
+                            score += config.weight;
+                        }
+                    });
+                    if (score > bestMatch.score) {
+                        bestMatch = { intent, score };
+                    }
+                });
+                
+                analysis.intent = bestMatch.score > 5 ? bestMatch.intent : null;
+                
+                if (msg.includes('sciatica') || msg.includes('leg pain')) analysis.concerns.push('sciatica');
+                if (msg.includes('headache') || msg.includes('migraine')) analysis.concerns.push('headaches');
+                if (msg.includes('scoliosis')) analysis.concerns.push('scoliosis');
+                if (msg.includes('neck')) analysis.concerns.push('neck');
+                if (msg.includes('back')) analysis.concerns.push('back');
+                
+                return analysis;
+            },
+
+            getConversationContext: function() {
+                const history = conversationState.conversationHistory;
+                return {
+                    lastTopic: history.length > 0 ? history[history.length - 1].topic : null,
+                    discussedTopics: [...new Set(history.map(h => h.topic).filter(Boolean))],
+                    messageCount: conversationState.messageCount,
+                    userConcerns: conversationState.userProfile.concerns,
+                    hasDiscussedCBP: history.some(h => h.topic === 'cbp'),
+                    hasDiscussedBooking: history.some(h => h.topic === 'booking')
+                };
+            },
+
+            updateUserProfile: function(analysis) {
+                if (analysis.concerns.length > 0) {
+                    analysis.concerns.forEach(concern => {
+                        if (!conversationState.userProfile.concerns.includes(concern)) {
+                            conversationState.userProfile.concerns.push(concern);
+                        }
+                    });
+                }
+                
+                if (analysis.urgency === 'high') {
+                    conversationState.userProfile.urgency = 'high';
+                }
+            },
+
+            generateIntentResponse: function(intent, analysis, context) {
+                const responses = {
+                    booking: this.generateBookingResponse(analysis, context),
+                    cbp: this.generateCBPResponse(analysis, context),
+                    scoliosis: this.generateScoliosisResponse(analysis, context),
+                    sciatica: this.generateSciaticaResponse(analysis, context),
+                    headaches: this.generateHeadacheResponse(analysis, context),
+                    backPain: this.generateBackPainResponse(analysis, context),
+                    neckPain: this.generateNeckPainResponse(analysis, context),
+                    insurance: this.generateInsuranceResponse(analysis, context),
+                    results: this.generateResultsResponse(analysis, context),
+                    newPatient: this.generateNewPatientResponse(analysis, context)
+                };
+                
+                return responses[intent] || this.generateIntelligentFallback(analysis, context);
+            },
+
+            generateSciaticaResponse: function(analysis, context) {
+                return {
+                    text: "Sciatica can be incredibly frustrating! 😓 The shooting pain down your leg often comes from spinal misalignment putting pressure on the sciatic nerve. Our CBP approach helps by:\n\n🎯 **Precise spinal correction** to relieve nerve pressure\n• Custom traction to restore proper spinal curves\n• Mirror-image exercises to retrain your posture\n• Long-term structural changes, not just pain relief\n\nMost patients notice improvement within the first few weeks! Would you like to schedule a complimentary consultation?",
+                    topic: 'sciatica',
+                    followUps: ['How long for sciatica relief?', 'CBP vs other treatments?', 'Book consultation'],
+                    shouldOfferBooking: true
+                };
+            },
+
+            generateBookingResponse: function(analysis, context) {
+                return {
+                    text: "I'd love to help you get scheduled with Dr. Tyler! 😊 New patients receive a complimentary consultation where Dr. Tyler will:\n\n📋 **Complete Assessment:**\n• Detailed discussion of your concerns\n• Thorough spinal examination\n• Digital X-rays if needed\n• Personalized treatment recommendations\n\nThe consultation typically takes 60-90 minutes. Would you like to schedule?",
+                    topic: 'booking',
+                    shouldShowBooking: true
+                };
+            },
+
+            generateCBPResponse: function(analysis, context) {
+                return {
+                    text: "CBP (Chiropractic BioPhysics®) is what makes our practice special! 🔬 It's the most researched chiropractic technique, using physics principles to precisely correct spinal alignment.\n\n🎯 **What makes CBP unique:**\n• Uses digital X-ray analysis for precise measurements\n• Creates custom treatment plans based on YOUR spinal geometry\n• Combines adjustments, traction, and exercises\n• Backed by over 200 research studies\n\nDr. Tyler is CBP-certified with advanced training beyond regular chiropractic school!",
+                    topic: 'cbp',
+                    followUps: ['How is CBP different?', 'Dr. Tyler\'s qualifications?', 'Book CBP consultation']
+                };
+            },
+
+            generateIntelligentFallback: function(analysis, context) {
+                const fallbacks = [
+                    "That's a thoughtful question! While I can share general information about CBP treatment, Dr. Tyler would be the best person to give you specific guidance for your unique situation.",
+                    "Great question! For detailed answers about your particular case, I'd recommend speaking with Dr. Tyler during a consultation.",
+                    "I appreciate you asking! Every patient's situation is unique, so Dr. Tyler would need to evaluate your case for the most accurate information."
+                ];
+                
+                let response = fallbacks[Math.floor(Math.random() * fallbacks.length)];
+                
+                if (conversationState.userProfile.concerns.length > 0) {
+                    const concerns = conversationState.userProfile.concerns.join(' and ');
+                    response += ` Since you've mentioned ${concerns}, I think you'd really benefit from his expertise.`;
+                }
+                
+                response += "\n\nWould you like to schedule a complimentary consultation?";
+                
+                return {
+                    text: response,
+                    topic: 'general',
+                    followUps: ['Tell me about CBP', 'Schedule consultation', 'Insurance questions'],
+                    shouldOfferBooking: true
+                };
+            }
+        };
+
+        // STEP 6: Initialize AI System
+        const aiChatSystem = new EnhancedChatSystem();
+
+        // STEP 7: Updated Main Process Message Function (REPLACE your existing one)
+        async function processMessage(message) {
+            console.log('🤖 Processing message with enhanced AI:', message);
+            
+            // Handle lead capture if in progress
+            if (conversationState.leadCaptureStep !== 'none' && conversationState.leadCaptureStep !== 'complete') {
+                processLeadCapture(message);
+                return;
+            }
+
+            // Check for AI lead capture
+            if (aiChatSystem.leadCapture.isCapturing) {
+                const leadResult = await aiChatSystem.leadCapture.processInput(message);
+                if (leadResult) {
+                    showTypingIndicator();
+                    setTimeout(() => {
+                        removeTypingIndicator();
+                        addMessage(leadResult, 'bot');
+                        addBookingButtons();
+                        updateStatus('Ready • AI Assistant');
+                    }, 1000);
+                    return;
+                }
+            }
+
+            // Show typing indicator
+            showTypingIndicator();
+            updateStatus(CONFIG.useAI ? 'AI thinking...' : 'Analyzing your question...');
+
+            let response;
+            let useOriginalSystem = false;
+
+            // Try AI first if enabled
+            if (CONFIG.useAI) {
+                try {
+                    const aiResponse = await aiChatSystem.sendMessage(message);
+                    response = {
+                        text: aiResponse,
+                        topic: 'ai-conversation',
+                        shouldOfferBooking: shouldOfferBookingAI(aiResponse),
+                        isAI: true
+                    };
+
+                    // Check if we should start lead capture
+                    if (aiChatSystem.shouldStartLeadCapture()) {
+                        aiChatSystem.leadCapture.start();
+                    }
+
+                } catch (error) {
+                    console.error('AI failed, falling back to original system:', error);
+                    useOriginalSystem = true;
+                    updateAIModeIndicator(false);
+                }
+            } else {
+                useOriginalSystem = true;
+            }
+
+            // Fall back to original system if needed
+            if (useOriginalSystem || !CONFIG.useAI) {
+                response = intelligentResponses.generateResponse(message);
+                
+                // Add conversation to history
+                conversationState.conversationHistory.push({
+                    user: message,
+                    bot: response.text,
+                    topic: response.topic,
+                    timestamp: new Date()
+                });
+            }
+
+            // Show response
+            setTimeout(() => {
+                removeTypingIndicator();
+                addMessage(response.text, 'bot');
+                
+                // Add follow-up buttons for original system
+                if (response.followUps && response.followUps.length > 0) {
+                    setTimeout(() => {
+                        addFollowUpButtons(response.followUps);
+                    }, 800);
+                }
+                
+                // Add booking buttons if appropriate
+                if (response.shouldOfferBooking || response.shouldShowBooking) {
+                    setTimeout(() => {
+                        addBookingButtons();
+                    }, 1200);
+                }
+                
+                updateStatus('Ready • AI Assistant');
+            }, 1000 + Math.random() * 1000);
+        }
+
+        // STEP 8: Helper Functions
+        function shouldOfferBookingAI(response) {
+            const bookingKeywords = ['appointment', 'schedule', 'consultation', 'visit', 'book'];
+            return bookingKeywords.some(keyword => 
+                response.toLowerCase().includes(keyword)
+            );
+        }
+
+        function updateAIModeIndicator(isAI) {
+            const indicator = document.getElementById('aiModeIndicator');
+            if (indicator) {
+                if (isAI) {
+                    indicator.textContent = '🤖 AI Mode';
+                    indicator.style.background = 'rgba(16, 185, 129, 0.3)';
+                } else {
+                    indicator.textContent = '⚡ Smart Mode';
+                    indicator.style.background = 'rgba(245, 158, 11, 0.3)';
+                }
+            }
+        }
+
+        // STEP 9: Keep ALL your existing functions unchanged
+        function shouldStartLeadCapture() {
+            return conversationState.messageCount >= 3 && 
+                   !conversationState.leadCaptureStarted && 
+                   conversationState.leadCaptureStep === 'none';
+        }
+        
+        function startConversationalLeadCapture() {
+            console.log('💬 Starting intelligent lead capture');
+            conversationState.leadCaptureStarted = true;
+            conversationState.leadCaptureStep = 'name';
+            
+            const concerns = conversationState.userProfile.concerns;
+            let leadMessage = "I can see you're interested in learning more about our approach! 😊 ";
+            
+            if (concerns.length > 0) {
+                leadMessage += `Since you've asked about ${concerns.join(' and ')}, `;
+            }
+            
+            leadMessage += "I'd love to connect you with Dr. Tyler for a personalized consultation.";
+            
+            setTimeout(() => {
+                addMessage(leadMessage, 'bot');
+                setTimeout(() => {
+                    addMessage("To get you scheduled, could you tell me your first name?", 'bot');
+                }, 1000);
+            }, 2000);
+        }
+        
+        function processLeadCapture(message) {
+            console.log('📋 Processing lead capture step:', conversationState.leadCaptureStep);
+            
+            switch (conversationState.leadCaptureStep) {
+                case 'name':
+                    conversationState.leadData.name = message;
+                    conversationState.leadCaptureStep = 'email';
+                    setTimeout(() => {
+                        addMessage(`Nice to meet you, ${message}! 👋`, 'bot');
+                        setTimeout(() => {
+                            addMessage("What's the best email address to reach you at?", 'bot');
+                        }, 800);
+                    }, 500);
+                    break;
+                    
+                case 'email':
+                    conversationState.leadData.email = message;
+                    conversationState.leadCaptureStep = 'phone';
+                    setTimeout(() => {
+                        addMessage("Perfect! And what's your phone number?", 'bot');
+                    }, 500);
+                    break;
+                    
+                case 'phone':
+                    conversationState.leadData.phone = message;
+                    conversationState.leadCaptureStep = 'complete';
+                    
+                    const leadData = {
+                        ...conversationState.leadData,
+                        concerns: conversationState.userProfile.concerns,
+                        urgency: conversationState.userProfile.urgency,
+                        conversationHistory: conversationState.conversationHistory,
+                        timestamp: new Date().toISOString()
+                    };
+                    
+                    console.log('✅ Lead captured:', leadData);
+                    sendLeadToEmail(leadData);
+                    
+                    setTimeout(() => {
+                        addMessage(`Excellent! 🎉 Dr. Tyler's team will reach out within 24 hours.`, 'bot');
+                        setTimeout(() => {
+                            addBookingButtons();
+                        }, 1000);
+                    }, 500);
+                    break;
+            }
+        }
+        
+        function sendLeadToEmail(leadData) {
+            console.log('📧 Sending lead to drtyler@coreposture.com:', leadData);
+            
+            try {
+                const leads = JSON.parse(localStorage.getItem('corePostureLeads') || '[]');
+                leads.push(leadData);
+                localStorage.setItem('corePostureLeads', JSON.stringify(leads));
+            } catch (e) {
+                console.log('Lead data ready for email integration:', leadData);
+            }
+        }
+        
+        // Keep ALL your existing UI functions exactly as they are
+        function addMessage(text, sender) {
+            const messages = document.getElementById('messages');
+            if (!messages) return;
+            
+            const messageDiv = document.createElement('div');
+            
+            if (sender === 'bot') {
+                messageDiv.className = 'bot-message';
+                messageDiv.innerHTML = `
+                    <div class="bot-avatar">CP</div>
+                    <div class="bot-bubble">
+                        <div class="bot-name">CorePosture Assistant</div>
+                        ${text}
+                    </div>
+                `;
+            } else {
+                messageDiv.className = 'user-message';
+                messageDiv.innerHTML = `
+                    <div class="user-bubble">
+                        <div class="user-name">You</div>
+                        ${text}
+                    </div>
+                `;
+            }
+            
+            messages.appendChild(messageDiv);
+            messages.scrollTop = messages.scrollHeight;
+        }
+        
+        function addFollowUpButtons(followups) {
+            const messages = document.getElementById('messages');
+            const buttonDiv = document.createElement('div');
+            buttonDiv.className = 'bot-message';
+            
+            const buttonsHtml = followups.map(followup => 
+                `<span class="quick-btn" onclick="sendQuick('${followup.replace(/'/g, '\\\'')}')">${followup}</span>`
+            ).join('');
+            
+            buttonDiv.innerHTML = `
+                <div class="bot-avatar">CP</div>
+                <div class="bot-bubble">
+                    <div style="margin-bottom: 8px; font-size: 12px; color: #6b7280;">Quick questions:</div>
+                    <div class="quick-btns">
+                        ${buttonsHtml}
+                    </div>
+                </div>
+            `;
+            
+            messages.appendChild(buttonDiv);
+            messages.scrollTop = messages.scrollHeight;
+        }
+        
+        function addBookingButtons() {
+            const messages = document.getElementById('messages');
+            const bookingDiv = document.createElement('div');
+            bookingDiv.className = 'bot-message';
+            
+            bookingDiv.innerHTML = `
+                <div class="bot-avatar">CP</div>
+                <div class="bot-bubble">
+                    <div class="booking-buttons">
+                        <a href='https://coreposturechiropractic.com/schedule/' target='_blank' class='booking-btn'>🆕 New Patient Booking</a>
+                        <a href='https://coreposturechiropractic.com/schedule-existing/' target='_blank' class='booking-btn'>👤 Existing Patient</a>
+                    </div>
+                    <div style="text-align: center; margin-top: 12px; font-size: 12px; color: #6b7280;">
+                        Or call: <strong>(949) 536-5506</strong>
+                    </div>
+                </div>
+            `;
+            
+            messages.appendChild(bookingDiv);
+            messages.scrollTop = messages.scrollHeight;
+        }
+        
+        function showTypingIndicator() {
+            const messages = document.getElementById('messages');
+            const typingDiv = document.createElement('div');
+            typingDiv.id = 'typing-indicator';
+            typingDiv.className = 'bot-message';
+            typingDiv.innerHTML = `
+                <div class="bot-avatar">CP</div>
+                <div class="bot-bubble">
+                    <div class="typing-indicator">
+                        ${CONFIG.useAI ? 'AI thinking' : 'Analyzing'}<span class="typing-dots"><span></span><span></span><span></span></span>
+                    </div>
+                </div>
+            `;
+            
+            messages.appendChild(typingDiv);
+            messages.scrollTop = messages.scrollHeight;
+        }
+        
+        function removeTypingIndicator() {
+            const typing = document.getElementById('typing-indicator');
+            if (typing) typing.remove();
+        }
+        
+        function updateStatus(text) {
+            const status = document.getElementById('status');
+            if (status) status.textContent = text;
+        }
+        
+        function sendMessage() {
+            const input = document.getElementById('userInput');
+            if (!input) return;
+            
+            const message = input.value.trim();
+            if (!message) return;
+            
+            addMessage(message, 'user');
+            input.value = '';
+            
+            processMessage(message);
+            conversationState.messageCount++;
+            
+            // Original system lead capture
+            if (!CONFIG.useAI && shouldStartLeadCapture()) {
+                startConversationalLeadCapture();
+            }
+        }
+        
+        function sendQuick(message) {
+            addMessage(message, 'user');
+            processMessage(message);
+            conversationState.messageCount++;
+        }
+        
+        // STEP 10: Enhanced Initialization
+        function initializeChatbot() {
+            console.log('🔧 Setting up enhanced conversational chatbot...');
+            
+            // Update mode indicator
+            updateAIModeIndicator(CONFIG.useAI);
+            
+            const welcomeMessage = intelligentResponses.generateGreeting();
+            
+            const initialHTML = `
+                <div class="bot-message">
+                    <div class="bot-avatar">CP</div>
+                    <div class="bot-bubble">
+                        <div class="bot-name">CorePosture Assistant</div>
+                        ${welcomeMessage}
+                        
+                        <div class="quick-btns">
+                            <span class="quick-btn" onclick="sendQuick('What is CBP treatment?')">CBP Treatment</span>
+                            <span class="quick-btn" onclick="sendQuick('Scoliosis help')">Scoliosis Care</span>
+                            <span class="quick-btn" onclick="sendQuick('Sciatica pain')">Sciatica</span>
+                            <span class="quick-btn" onclick="sendQuick('Headache relief')">Headaches</span>
+                            <span class="quick-btn" onclick="sendQuick('Insurance coverage')">Insurance</span>
+                            <span class="quick-btn" onclick="sendQuick('Book appointment')">Book Now</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('messages').innerHTML = initialHTML;
+            
+            const input = document.getElementById('userInput');
+            if (input) {
+                input.focus();
+                input.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') {
+                        sendMessage();
+                    }
+                });
+            }
+            
+            console.log('✅ Enhanced chatbot initialized!');
+            console.log(`🤖 AI Mode: ${CONFIG.useAI ? 'ENABLED' : 'DISABLED'}`);
+            console.log(`🔗 API Endpoint: ${CONFIG.apiEndpoint}`);
+        }
+        
+        // Initialize when page loads
+        window.addEventListener('load', function() {
+            console.log('✅ Page loaded, initializing enhanced chatbot...');
+            initializeChatbot();
+        });
+        
+        console.log('📜 Enhanced conversational chatbot script loaded successfully');
+    </script>
+</body>
+</html>
