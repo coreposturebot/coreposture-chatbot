@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CorePosture Chiropractic</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 0;
+        }
+        
+        .chatbot {
+            width: 420px;
+            height: 700px;
+            background: #ffffff;
+            border-radius: 24px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #2d5aa0 0%, #1e3c72 100%);
+            color: white;
+            padding: 32px 24px 28px 24px;
+            text-align: center;
+            position: relative;
+        }
+        
+        .header h2 {
+            font-weight: 600;
+            font-size: 20px;
+            margin-bottom: 4px;
+        }
+        
+        .header p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        
+        .messages {
+            flex: 1;
+            padding: 24px 20px;
+            overflow-y: auto;
+            background: #fafbfc;
+        }
+        
+        .message {
+            margin: 16px 0;
+        }
+        
+        .bot-message {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 20px;
+        }
+        
+        .bot-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #2d5aa0, #1e3c72);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 12px;
+            margin-right: 12px;
+            flex-shrink: 0;
+        }
+        
+        .bot-bubble {
+            background: #ffffff;
+            padding: 16px 20px;
+            border-radius: 20px 20px 20px 4px;
+            max-width: 80%;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+            font-size: 14px;
+            line-height: 1.5;
+            color: #374151;
+        }
+        
+        .user-message {
+            display: flex;
+            justify-content: flex-end;
+            margin-bottom: 20px;
+        }
+        
+        .user-bubble {
+            background: linear-gradient(135deg, #2d5aa0, #1e3c72);
+            color: white;
+            padding: 16px 20px;
+            border-radius: 20px 20px 4px 20px;
+            max-width: 80%;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+        
+        .quick-btns {
+            margin: 16px 0 8px 0;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        
+        .quick-btn {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            padding: 8px 14px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 12px;
+            color: #495057;
+            transition: all 0.2s ease;
+        }
+        
+        .quick-btn:hover {
+            background: #2d5aa0;
+            color: white;
+            border-color: #2d5aa0;
+        }
+        
+        .booking-buttons {
+            margin: 16px 0;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        
+        .booking-btn {
+            background: linear-gradient(135deg, #dc2626, #b91c1c);
+            color: white;
+            border: none;
+            padding: 14px 20px;
+            border-radius: 16px;
+            cursor: pointer;
+            text-decoration: none;
+            text-align: center;
+            font-weight: 500;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+        
+        .booking-btn:hover {
+            transform: translateY(-2px);
+        }
+        
+        .input-area {
+            padding: 20px 24px;
+            background: #ffffff;
+            border-top: 1px solid #f1f3f4;
+        }
+        
+        .input-wrapper {
+            display: flex;
+            align-items: center;
+            background: #f8f9fa;
+            border-radius: 24px;
+            padding: 4px;
+            border: 2px solid transparent;
+        }
+        
+        .input-wrapper:focus-within {
+            background: #ffffff;
+            border-color: #2d5aa0;
+        }
+        
+        .input-field {
+            flex: 1;
+            border: none;
+            background: transparent;
+            padding: 14px 20px;
+            font-size: 14px;
+            outline: none;
+            color: #374151;
+        }
+        
+        .input-field::placeholder {
+            color: #9ca3af;
+        }
+        
+        .send-btn {
+            background: linear-gradient(135deg, #2d5aa0, #1e3c72);
+            color: white;
+            border: none;
+            width: 44px;
+            height: 44px;
+            border-radius: 22px;
+            cursor: pointer;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .send-btn:hover {
+            transform: scale(1.05);
+        }
+        
+        .status {
+            color: #6b7280;
+            font-size: 11px;
+            text-align: center;
+            padding: 8px;
+        }
+        
+        .typing {
+            font-style: italic;
+            color: #6b7280;
+            font-size: 13px;
+        }
+        
+        @media (max-width: 480px) {
+            body {
+                padding: 0;
+            }
+            
+            .chatbot {
+                width: 100vw;
+                height: 100vh;
+                border-radius: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="chatbot">
+        <div class="header">
+            <h2>CorePosture Chiropractic</h2>
+            <p>Newport Beach, CA • AI Assistant</p>
+        </div>
+        
+        <div class="messages" id="messagesContainer"></div>
+        
+        <div class="input-area">
+            <div class="input-wrapper">
+                <input type="text" id="messageInput" class="input-field" placeholder="Ask me anything about CorePosture...">
+                <button onclick="sendUserMessage()" class="send-btn">➤</button>
+            </div>
+        </div>
+        
+        <div class="status" id="statusText">Ready • GPT-Powered</div>
+    </div>
+
+    <script>
+        const GPT_WORKER_URL = 'https://coreposture-gpt-api.drtyler.workers.dev';
+        let conversationHistory = [];
+        let totalMessages = 0;
+        
+        function displayMessage(text, isUser) {
+            const container = document.getElementById('messagesContainer');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'message';
+            
+            if (isUser) {
+                messageDiv.innerHTML = `
+                    <div class="user-message">
+                        <div class="user-bubble">${text}</div>
+                    </div>
+                `;
+            } else {
+                messageDiv.innerHTML = `
+                    <div class="bot-message">
+                        <div class="bot-avatar">CP</div>
+                        <div class="bot-bubble">${text}</div>
+                    </div>
+                `;
+            }
+            
+            container.appendChild(messageDiv);
+            container.scrollTop = container.scrollHeight;
+        }
+        
+        function showQuickButtons(buttons) {
+            const container = document.getElementById('messagesContainer');
+            const buttonDiv = document.createElement('div');
+            buttonDiv.className = 'message';
+            
+            const buttonHtml = buttons.map(btn => 
+                `<span class="quick-btn" onclick="handleQuickClick('${btn.replace(/'/g, "\\'")}')">${btn}</span>`
+            ).join('');
+            
+            buttonDiv.innerHTML = `
+                <div class="bot-message">
+                    <div class="bot-avatar">CP</div>
+                    <div class="bot-bubble">
+                        <div class="quick-btns">${buttonHtml}</div>
+                    </div>
+                </div>
+            `;
+            
+            container.appendChild(buttonDiv);
+            container.scrollTop = container.scrollHeight;
+        }
+        
+        function showBookingOptions() {
+            const container = document.getElementById('messagesContainer');
+            const bookingDiv = document.createElement('div');
+            bookingDiv.className = 'message';
+            
+            bookingDiv.innerHTML = `
+                <div class="bot-message">
+                    <div class="bot-avatar">CP</div>
+                    <div class="bot-bubble">
+                        <div class="booking-buttons">
+                            <a href="https://coreposturechiropractic.com/schedule/" target="_blank" class="booking-btn">🆕 New Patient Booking</a>
+                            <a href="https://coreposturechiropractic.com/schedule-existing/" target="_blank" class="booking-btn">👤 Existing Patient</a>
+                        </div>
+                        <div style="text-align: center; margin-top: 12px; font-size: 12px; color: #6b7280;">
+                            Or call: <strong>(949) 536-5506</strong>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            container.appendChild(bookingDiv);
+            container.scrollTop = container.scrollHeight;
+        }
+        
+        function showTypingIndicator() {
+            displayMessage('<span class="typing">Thinking...</span>', false);
+        }
+        
+        function removeTypingIndicator() {
+            const container = document.getElementById('messagesContainer');
+            const messages = container.querySelectorAll('.message');
+            const lastMessage = messages[messages.length - 1];
+            if (lastMessage && lastMessage.innerHTML.includes('Thinking...')) {
+                lastMessage.remove();
+            }
+        }
+        
+        function updateStatus(text) {
+            document.getElementById('statusText').textContent = text;
+        }
+        
+        async function callGPTWorker(userMessage) {
+            console.log('📤 Sending to GPT:', userMessage);
+            updateStatus('Connecting to AI...');
+            
+            try {
+                const response = await fetch(GPT_WORKER_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        message: userMessage,
+                        conversationHistory: conversationHistory
+                    })
+                });
+                
+                console.log('📨 Worker status:', response.status);
+                
+                if (!response.ok) {
+                    throw new Error(`Worker returned status: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                console.log('🤖 GPT responded:', data);
+                
+                // Update conversation history
+                conversationHistory.push(
+                    { role: 'user', content: userMessage },
+                    { role: 'assistant', content: data.text }
+                );
+                
+                // Keep history manageable
+                if (conversationHistory.length > 20) {
+                    conversationHistory = conversationHistory.slice(-20);
+                }
+                
+                updateStatus('Ready • GPT-Powered');
+                return data;
+                
+            } catch (error) {
+                console.error('❌ Error calling GPT:', error);
+                updateStatus('Connection Error');
+                return {
+                    text: "I'm having trouble connecting right now. Please try again in a moment, or call our Newport Beach office at (949) 536-5506.",
+                    shouldShowBooking: true,
+                    followUps: []
+                };
+            }
+        }
+        
+        async function processUserMessage(message) {
+            totalMessages++;
+            
+            showTypingIndicator();
+            
+            const gptResponse = await callGPTWorker(message);
+            
+            removeTypingIndicator();
+            displayMessage(gptResponse.text, false);
+            
+            // Show follow-up buttons if provided
+            if (gptResponse.followUps && gptResponse.followUps.length > 0) {
+                setTimeout(() => {
+                    showQuickButtons(gptResponse.followUps);
+                }, 800);
+            }
+            
+            // Show booking options if recommended
+            if (gptResponse.shouldShowBooking) {
+                setTimeout(() => {
+                    showBookingOptions();
+                }, 1200);
+            }
+        }
+        
+        function sendUserMessage() {
+            const input = document.getElementById('messageInput');
+            const message = input.value.trim();
+            
+            if (!message) return;
+            
+            displayMessage(message, true);
+            input.value = '';
+            
+            processUserMessage(message);
+        }
+        
+        function handleQuickClick(message) {
+            displayMessage(message, true);
+            processUserMessage(message);
+        }
+        
+        function initializeChatbot() {
+            console.log('🚀 Starting CorePosture GPT Chatbot...');
+            
+            // Welcome message
+            const welcomeText = `Hi there! 👋 Welcome to CorePosture Chiropractic! I'm here to help answer your questions about Dr. Tyler Meier's CBP approach and how we can help with your spinal health concerns. What brings you here today?
+            
+            <div class="quick-btns">
+                <span class="quick-btn" onclick="handleQuickClick('What is CBP treatment?')">CBP Treatment</span>
+                <span class="quick-btn" onclick="handleQuickClick('Help with scoliosis')">Scoliosis Care</span>
+                <span class="quick-btn" onclick="handleQuickClick('I have sciatica pain')">Sciatica</span>
+                <span class="quick-btn" onclick="handleQuickClick('Chronic headaches')">Headaches</span>
+                <span class="quick-btn" onclick="handleQuickClick('Insurance questions')">Insurance</span>
+                <span class="quick-btn" onclick="handleQuickClick('Schedule appointment')">Book Now</span>
+            </div>`;
+            
+            displayMessage(welcomeText, false);
+            
+            // Setup enter key listener
+            document.getElementById('messageInput').addEventListener('keypress', function(event) {
+                if (event.key === 'Enter') {
+                    sendUserMessage();
+                }
+            });
+            
+            // Focus input
+            document.getElementById('messageInput').focus();
+            
+            console.log('✅ Chatbot initialized successfully');
+        }
+        
+        // Start when page loads
+        window.addEventListener('load', initializeChatbot);
+        
+        console.log('📜 CorePosture GPT Chatbot script loaded');
+    </script>
+</body>
+</html>
